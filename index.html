@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#1e1e1e">
     <title>ProCode Editor</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
@@ -35,49 +36,38 @@
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); }
-
-        #app { display: flex; flex-direction: column; height: 100%; position: relative; }
-
-        /* Header */
+        
+        #app { display: flex; flex-direction: column; height: 100%; }
+        
         #header {
             background: var(--header);
             border-bottom: 1px solid var(--border);
-            padding: 6px 10px;
-            padding-top: max(6px, env(safe-area-inset-top));
+            padding: 8px 12px;
+            padding-top: max(8px, env(safe-area-inset-top));
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-shrink: 0;
-            z-index: 10;
         }
 
-        #filename { 
-            flex: 1; 
-            background: transparent; 
-            border: 1px solid var(--border); 
-            color: var(--text); 
-            font-size: 14px; 
-            padding: 6px 8px; 
-            border-radius: 6px; 
-        }
+        #filename { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 14px; padding: 6px 10px; border-radius: 6px; }
         #filename:focus { border-color: var(--accent); outline: none; }
-
+        
         .icon-btn {
-            width: 32px; 
-            height: 32px; 
-            border: none; 
-            border-radius: 6px; 
-            background: var(--button); 
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 6px;
+            background: var(--button);
             color: white;
-            font-size: 14px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
         .icon-btn.secondary { background: transparent; border: 1px solid var(--border); }
 
-        /* Tabs */
         #tabs-container {
             background: var(--tab-bg);
             border-bottom: 1px solid var(--border);
@@ -85,84 +75,53 @@
             overflow-x: auto;
             scrollbar-width: none;
             flex-shrink: 0;
-            z-index: 10;
-            min-height: 36px;
         }
         #tabs-container::-webkit-scrollbar { display: none; }
 
         .tab {
-            padding: 8px 12px; 
-            font-size: 12px; 
-            background: var(--tab-bg); 
+            padding: 10px 14px;
+            font-size: 13px;
+            background: var(--tab-bg);
             border-right: 1px solid var(--border);
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            white-space: nowrap; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
             user-select: none;
-            max-width: 140px;
         }
-        .tab.active { 
-            background: var(--tab-active); 
-            border-bottom: 2px solid var(--accent); 
-            font-weight: 600; 
-        }
-        .tab-close { 
-            width: 16px; 
-            height: 16px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 4px; 
-            font-size: 13px; 
-        }
+        .tab.active { background: var(--tab-active); border-bottom: 2px solid var(--accent); font-weight: 600; }
+        .tab-close { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 15px; }
         .tab-close:active { background: #ff3b30; color: white; }
         
-        #new-tab-btn { 
-            padding: 8px 14px; 
-            background: transparent; 
-            border: none; 
-            color: var(--text); 
-            font-size: 18px; 
-            cursor: pointer; 
-        }
+        #new-tab-btn { padding: 10px 16px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
 
-        /* Editor */
-        #editor-container {
+        #editor-wrapper {
             flex: 1;
             display: flex;
             overflow: hidden;
-            position: relative;
+            margin-bottom: calc(44px + env(safe-area-inset-bottom));
         }
 
         #line-numbers {
-            width: 36px;
+            width: 40px;
             background: var(--bg);
             border-right: 1px solid var(--border);
-            padding: 8px 4px;
+            padding: 10px 4px;
             font-family: monospace;
             font-size: var(--font-size);
             line-height: 1.5;
             color: var(--text-muted);
             text-align: right;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             user-select: none;
             flex-shrink: 0;
         }
 
-        #editor-wrapper {
-            flex: 1;
-            position: relative;
-            overflow: auto;
-        }
-
         textarea {
-            width: 100%;
-            min-height: 100%;
+            flex: 1;
             border: none;
-            padding: 8px;
+            padding: 10px;
             font-family: monospace;
             font-size: var(--font-size);
             line-height: 1.5;
@@ -171,101 +130,94 @@
             resize: none;
             outline: none;
             tab-size: 4;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            display: block;
+            -webkit-user-select: text;
+            user-select: text;
+            white-space: pre;
+            overflow: auto;
         }
-
-        /* Kompakt Toolbar */
-        #toolbar-container {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--header);
-            border-top: 1px solid var(--border);
-            z-index: 1000;
-            padding-bottom: env(safe-area-inset-bottom);
-            transition: transform 0.2s ease;
-        }
+        textarea::selection { background: rgba(0,122,204,0.4); }
 
         #toolbar {
-            height: 38px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background: var(--header);
+            border-top: 1px solid var(--border);
             display: flex;
-            gap: 4px;
-            padding: 4px 6px;
+            gap: 6px;
+            padding: 6px;
             overflow-x: auto;
-            scrollbar-width: none;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 100;
         }
         #toolbar::-webkit-scrollbar { display: none; }
 
         .tool-btn {
-            height: 30px;
-            padding: 0 10px;
+            height: 32px;
+            padding: 0 12px;
             background: #3c3c3c;
             border: 1px solid #505050;
             color: white;
-            border-radius: 4px;
+            border-radius: 6px;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
-            min-width: 32px;
         }
         .tool-btn:active { background: var(--accent); }
 
-        /* Floating Nav - Daha küçük */
         #float-nav {
             position: fixed;
-            right: 10px;
-            bottom: calc(50px + env(safe-area-inset-bottom));
+            right: 12px;
+            bottom: calc(60px + env(safe-area-inset-bottom));
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            z-index: 999;
-            transition: transform 0.2s ease;
+            gap: 8px;
+            z-index: 90;
         }
         .nav-btn {
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%; 
-            background: var(--accent); 
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
             color: white;
-            border: none; 
-            font-size: 16px; 
-            cursor: pointer; 
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
             opacity: 0.9;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            display: flex; 
-            align-items: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
         .nav-btn:active { opacity: 1; transform: scale(0.95); }
 
         /* Menu */
-        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 2000; }
+        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 200; }
         #menu-overlay.show { display: block; }
-
+        
         #menu {
             position: fixed;
-            top: calc(env(safe-area-inset-top) + 45px);
-            right: 10px;
+            top: calc(env(safe-area-inset-top) + 50px);
+            right: 12px;
             background: #2d2d2d;
             border: 1px solid var(--border);
             border-radius: 12px;
-            min-width: 200px;
+            min-width: 220px;
             max-height: 80vh;
             overflow-y: auto;
             display: none;
             flex-direction: column;
-            z-index: 2001;
+            z-index: 201;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         #menu.show { display: flex; }
-
+        
         .menu-item {
-            padding: 12px 14px;
-            font-size: 14px;
+            padding: 14px 16px;
+            font-size: 15px;
             background: transparent;
             border: none;
             border-bottom: 1px solid var(--border);
@@ -280,12 +232,12 @@
         .menu-item:active { background: var(--accent); }
         .menu-item.red { color: #ff6b6b; }
         .menu-item.red:active { background: #ff6b6b; color: white; }
-        .key-hint { font-size: 11px; color: var(--text-muted); margin-left: auto; padding-left: 16px; }
+        .key-hint { font-size: 12px; color: var(--text-muted); margin-left: auto; padding-left: 20px; }
 
-        /* Search - Daha kompakt */
-        #search-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 3000; }
+        /* Search - KOMPAKT ve ORTADA */
+        #search-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 300; }
         #search-overlay.show { display: block; }
-
+        
         #search-box {
             position: fixed;
             top: 50%;
@@ -295,50 +247,42 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
-            width: 90%;
+            width: 85%;
             max-width: 320px;
             display: none;
             flex-direction: column;
             gap: 10px;
-            z-index: 3001;
+            z-index: 301;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         #search-box.show { display: flex; }
-
-        .search-input { 
-            width: 100%; 
-            padding: 10px; 
-            background: var(--bg); 
-            border: 1px solid var(--border); 
-            border-radius: 8px; 
-            color: white; 
-            font-size: 15px; 
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
         }
-        .search-row { display: flex; gap: 6px; margin-top: 4px; }
-        .search-btn { 
-            flex: 1; 
-            padding: 10px 6px; 
-            background: #3c3c3c; 
-            border: 1px solid #505050; 
-            color: white; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 13px; 
+        .search-row { display: flex; gap: 8px; margin-top: 4px; }
+        .search-btn {
+            flex: 1;
+            padding: 10px 8px;
+            background: #3c3c3c;
+            border: 1px solid #505050;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
         }
         .search-btn.primary { background: var(--accent); }
 
         /* Preview */
-        #preview-modal { position: fixed; inset: 0; background: white; display: none; flex-direction: column; z-index: 4000; }
+        #preview-modal { position: fixed; inset: 0; background: white; display: none; flex-direction: column; z-index: 400; }
         #preview-modal.show { display: flex; }
-        #preview-header { 
-            height: 48px; 
-            background: var(--header); 
-            border-bottom: 1px solid var(--border); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 16px; 
-            padding-top: env(safe-area-inset-top); 
-        }
+        #preview-header { height: 50px; background: var(--header); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; padding-top: env(safe-area-inset-top); }
         #preview-frame { flex: 1; border: none; background: white; }
 
         input[type="file"] { display: none; }
@@ -356,33 +300,27 @@
             <button id="new-tab-btn">+</button>
         </div>
 
-        <div id="editor-container">
+        <div id="editor-wrapper">
             <div id="line-numbers">1</div>
-            <div id="editor-wrapper">
-                <textarea id="editor" spellcheck="false" autocapitalize="off"></textarea>
-            </div>
+            <textarea id="editor" spellcheck="false" autocapitalize="off"></textarea>
         </div>
     </div>
 
-    <!-- Kompakt Toolbar -->
-    <div id="toolbar-container">
-        <div id="toolbar">
-            <button class="tool-btn" data-char="\t">Tab</button>
-            <button class="tool-btn" data-char="<">&lt;</button>
-            <button class="tool-btn" data-char=">">&gt;</button>
-            <button class="tool-btn" data-char="/">/</button>
-            <button class="tool-btn" data-char="{">{</button>
-            <button class="tool-btn" data-char="}">}</button>
-            <button class="tool-btn" data-char="(">(</button>
-            <button class="tool-btn" data-char=")">)</button>
-            <button class="tool-btn" data-char=";">;</button>
-            <button class="tool-btn" data-char="=">=</button>
-            <button class="tool-btn" data-char='"'>"</button>
-            <button class="tool-btn" data-char="'">'</button>
-        </div>
+    <div id="toolbar">
+        <button class="tool-btn" data-char="\t">Tab</button>
+        <button class="tool-btn" data-char="<">&lt;</button>
+        <button class="tool-btn" data-char=">">&gt;</button>
+        <button class="tool-btn" data-char="/">/</button>
+        <button class="tool-btn" data-char="{">{</button>
+        <button class="tool-btn" data-char="}">}</button>
+        <button class="tool-btn" data-char="(">(</button>
+        <button class="tool-btn" data-char=")">)</button>
+        <button class="tool-btn" data-char=";">;</button>
+        <button class="tool-btn" data-char="=">=</button>
+        <button class="tool-btn" data-char='"'>"</button>
+        <button class="tool-btn" data-char="'">'</button>
     </div>
 
-    <!-- Navigasyon -->
     <div id="float-nav">
         <button class="nav-btn" data-nav="top">⤒</button>
         <button class="nav-btn" data-nav="up">↑</button>
@@ -414,8 +352,8 @@
         <input type="text" class="search-input" id="replace-text" placeholder="Değiştir...">
         <div class="search-row">
             <button class="search-btn" id="close-search">Kapat</button>
-            <button class="search-btn" id="find-prev">Önceki</button>
-            <button class="search-btn primary" id="find-next">Sonraki</button>
+            <button class="search-btn" id="find-prev">← Önceki</button>
+            <button class="search-btn primary" id="find-next">Sonraki →</button>
         </div>
         <div class="search-row">
             <button class="search-btn" id="replace-one">Değiştir</button>
@@ -435,9 +373,11 @@
     <input type="file" id="zip-input" accept=".zip">
 
     <script>
-        // Service Worker
+        // Service Worker Kaydı (Dosya olarak)
         if('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(console.error);
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW error:', err));
         }
 
         const App = {
@@ -446,24 +386,21 @@
             counter: 0,
             history: new Map(),
             zipFile: null,
-            fontSizes: [12, 13, 14, 15, 16, 18],
-            fontIndex: 2,
+            fontSizes: [12, 14, 16, 18, 20],
+            fontIndex: 1,
 
             init() {
                 this.cacheElements();
                 this.bindEvents();
-                this.setupKeyboardTracking();
                 this.newTab();
             },
 
             cacheElements() {
                 this.el = {
                     editor: document.getElementById('editor'),
-                    lineNumbers: document.getElementById('line-numbers'),
                     filename: document.getElementById('filename'),
                     tabsContainer: document.getElementById('tabs-container'),
-                    toolbarContainer: document.getElementById('toolbar-container'),
-                    floatNav: document.getElementById('float-nav'),
+                    lineNumbers: document.getElementById('line-numbers'),
                     menu: document.getElementById('menu'),
                     menuOverlay: document.getElementById('menu-overlay'),
                     searchBox: document.getElementById('search-box'),
@@ -477,33 +414,16 @@
                 };
             },
 
-            setupKeyboardTracking() {
-                if (window.visualViewport) {
-                    window.visualViewport.addEventListener('resize', () => {
-                        const keyboardHeight = window.innerHeight - window.visualViewport.height;
-                        if (keyboardHeight > 100) {
-                            this.el.toolbarContainer.style.transform = `translateY(-${keyboardHeight}px)`;
-                            this.el.floatNav.style.transform = `translateY(-${keyboardHeight}px)`;
-                        } else {
-                            this.el.toolbarContainer.style.transform = 'translateY(0)';
-                            this.el.floatNav.style.transform = 'translateY(0)';
-                        }
-                    });
-                }
-            },
-
             bindEvents() {
-                // Sekme olayları
                 document.getElementById('new-tab-btn').addEventListener('click', () => this.newTab());
+                document.getElementById('menu-btn').addEventListener('click', () => this.toggleMenu());
+                document.getElementById('preview-btn').addEventListener('click', () => this.togglePreview());
+                document.getElementById('close-preview').addEventListener('click', () => this.togglePreview());
+                this.el.menuOverlay.addEventListener('click', () => this.toggleMenu());
                 
                 this.el.filename.addEventListener('change', (e) => {
                     const tab = this.getActiveTab();
                     if(tab) { tab.name = e.target.value; this.renderTabs(); }
-                });
-
-                // Editor scroll senkronizasyonu
-                this.el.editor.addEventListener('scroll', () => {
-                    this.el.lineNumbers.scrollTop = this.el.editor.scrollTop;
                 });
 
                 this.el.editor.addEventListener('input', () => {
@@ -517,7 +437,10 @@
                     this.historyTimer = setTimeout(() => this.saveHistory(), 400);
                 });
 
-                // Toolbar
+                this.el.editor.addEventListener('scroll', () => {
+                    this.el.lineNumbers.scrollTop = this.el.editor.scrollTop;
+                });
+
                 document.querySelectorAll('.tool-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const char = btn.dataset.char === '\\t' ? '\t' : btn.dataset.char;
@@ -525,7 +448,6 @@
                     });
                 });
 
-                // Navigasyon
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -533,31 +455,20 @@
                     });
                 });
 
-                // Menü
-                document.getElementById('menu-btn').addEventListener('click', () => this.toggleMenu());
-                this.el.menuOverlay.addEventListener('click', () => this.toggleMenu());
-                
                 this.el.menu.addEventListener('click', (e) => {
                     const item = e.target.closest('.menu-item');
                     if(item) this.handleAction(item.dataset.action);
                 });
 
-                // Önizleme
-                document.getElementById('preview-btn').addEventListener('click', () => this.togglePreview());
-                document.getElementById('close-preview').addEventListener('click', () => this.togglePreview());
-
-                // Arama
                 document.getElementById('close-search').addEventListener('click', () => this.closeSearch());
                 document.getElementById('find-next').addEventListener('click', () => this.findNext());
                 document.getElementById('find-prev').addEventListener('click', () => this.findPrev());
                 document.getElementById('replace-one').addEventListener('click', () => this.replaceOne());
                 document.getElementById('replace-all').addEventListener('click', () => this.replaceAll());
 
-                // Dosyalar
                 this.el.fileInput.addEventListener('change', (e) => this.handleFile(e.target.files[0]));
                 this.el.zipInput.addEventListener('change', (e) => this.handleZip(e.target.files[0]));
 
-                // Kısayollar
                 document.addEventListener('keydown', (e) => {
                     if(e.key === 'Tab') { e.preventDefault(); this.insertText('    '); }
                     if(e.ctrlKey || e.metaKey) {
@@ -636,8 +547,8 @@
                 switch(dir) {
                     case 'top': ed.scrollTop = 0; ed.setSelectionRange(0,0); break;
                     case 'bottom': ed.scrollTop = ed.scrollHeight; const len=ed.value.length; ed.setSelectionRange(len,len); break;
-                    case 'up': ed.scrollBy({top: -150, behavior: 'smooth'}); break;
-                    case 'down': ed.scrollBy({top: 150, behavior: 'smooth'}); break;
+                    case 'up': ed.scrollBy({top: -200, behavior: 'smooth'}); break;
+                    case 'down': ed.scrollBy({top: 200, behavior: 'smooth'}); break;
                 }
             },
 
@@ -698,7 +609,7 @@
                     case 'copy': this.copy(); break;
                     case 'cut': this.cut(); break;
                     case 'paste': this.paste(); break;
-                    case 'clear': if(confirm('Tüm içerik silinsin mi?')) { this.el.editor.value=''; this.updateLineNumbers(); } break;
+                    case 'clear': if(confirm('Tüm içerik silinsin mi?')) { this.el.editor.value=''; this.el.editor.dispatchEvent(new Event('input')); } break;
                 }
             },
 
@@ -773,7 +684,7 @@
                 if(idx === -1) return;
                 ed.setSelectionRange(idx, idx + text.length);
                 ed.focus();
-                ed.scrollTop = (content.substring(0, idx).split('\n').length - 1) * 21 - 80;
+                ed.scrollTop = (content.substring(0, idx).split('\n').length - 1) * 21 - 100;
             },
 
             findPrev() {
@@ -811,7 +722,7 @@
                     if(name.match(/\.html?$/i)) {
                         this.el.previewFrame.srcdoc = content;
                     } else {
-                        this.el.previewFrame.srcdoc = `<pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word">${content.replace(/</g, '&lt;')}</pre>`;
+                        this.el.previewFrame.srcdoc = `<pre style="padding:20px;font-family:monospace;white-space:pre-wrap">${content.replace(/</g, '&lt;')}</pre>`;
                     }
                     this.el.previewModal.classList.add('show');
                 } else {
