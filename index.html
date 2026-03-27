@@ -20,17 +20,7 @@
             --tab-bg: #2d2d2d;
             --tab-active: #1e1e1e;
             --button: #0e639c;
-            --editor-font: 'Menlo', 'Monaco', 'Consolas', monospace;
             --font-size: 14px;
-            
-            /* Syntax Colors */
-            --syntax-keyword: #569cd6;
-            --syntax-string: #ce9178;
-            --syntax-comment: #6a9955;
-            --syntax-number: #b5cea8;
-            --syntax-function: #dcdcaa;
-            --syntax-tag: #569cd6;
-            --syntax-attr: #9cdcfe;
         }
 
         .light {
@@ -41,13 +31,6 @@
             --text: #333;
             --tab-bg: #ececec;
             --tab-active: #ffffff;
-            --syntax-keyword: #0000ff;
-            --syntax-string: #a31515;
-            --syntax-comment: #008000;
-            --syntax-number: #098658;
-            --syntax-function: #795e26;
-            --syntax-tag: #0000ff;
-            --syntax-attr: #ff0000;
         }
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,21 +42,38 @@
         #header {
             background: var(--header);
             border-bottom: 1px solid var(--border);
-            padding: 8px 12px;
-            padding-top: max(8px, env(safe-area-inset-top));
+            padding: 6px 10px;
+            padding-top: max(6px, env(safe-area-inset-top));
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
             z-index: 10;
         }
 
-        #filename { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 14px; padding: 6px 10px; border-radius: 6px; }
+        #filename { 
+            flex: 1; 
+            background: transparent; 
+            border: 1px solid var(--border); 
+            color: var(--text); 
+            font-size: 14px; 
+            padding: 6px 8px; 
+            border-radius: 6px; 
+        }
         #filename:focus { border-color: var(--accent); outline: none; }
 
         .icon-btn {
-            width: 36px; height: 36px; border: none; border-radius: 6px; background: var(--button); color: white;
-            font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 32px; 
+            height: 32px; 
+            border: none; 
+            border-radius: 6px; 
+            background: var(--button); 
+            color: white;
+            font-size: 14px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
         .icon-btn.secondary { background: transparent; border: 1px solid var(--border); }
 
@@ -86,99 +86,97 @@
             scrollbar-width: none;
             flex-shrink: 0;
             z-index: 10;
+            min-height: 36px;
         }
         #tabs-container::-webkit-scrollbar { display: none; }
 
         .tab {
-            padding: 10px 14px; font-size: 13px; background: var(--tab-bg); border-right: 1px solid var(--border);
-            cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; user-select: none;
-            max-width: 160px;
+            padding: 8px 12px; 
+            font-size: 12px; 
+            background: var(--tab-bg); 
+            border-right: 1px solid var(--border);
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            white-space: nowrap; 
+            user-select: none;
+            max-width: 140px;
         }
-        .tab.active { background: var(--tab-active); border-bottom: 2px solid var(--accent); font-weight: 600; }
-        .tab-close { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 15px; }
+        .tab.active { 
+            background: var(--tab-active); 
+            border-bottom: 2px solid var(--accent); 
+            font-weight: 600; 
+        }
+        .tab-close { 
+            width: 16px; 
+            height: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 4px; 
+            font-size: 13px; 
+        }
         .tab-close:active { background: #ff3b30; color: white; }
-        #new-tab-btn { padding: 10px 16px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
+        
+        #new-tab-btn { 
+            padding: 8px 14px; 
+            background: transparent; 
+            border: none; 
+            color: var(--text); 
+            font-size: 18px; 
+            cursor: pointer; 
+        }
 
-        /* Editor Area with Syntax Highlighting */
+        /* Editor */
         #editor-container {
             flex: 1;
-            position: relative;
-            overflow: hidden;
             display: flex;
+            overflow: hidden;
+            position: relative;
         }
 
         #line-numbers {
-            width: 45px;
+            width: 36px;
             background: var(--bg);
             border-right: 1px solid var(--border);
-            padding: 10px 5px;
-            font-family: var(--editor-font);
+            padding: 8px 4px;
+            font-family: monospace;
             font-size: var(--font-size);
-            line-height: 1.6;
+            line-height: 1.5;
             color: var(--text-muted);
             text-align: right;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             user-select: none;
             flex-shrink: 0;
         }
 
-        .editor-wrapper {
+        #editor-wrapper {
             flex: 1;
             position: relative;
             overflow: auto;
         }
 
-        /* Syntax Highlighted Content */
-        #code-display {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            min-height: 100%;
-            padding: 10px;
-            font-family: var(--editor-font);
-            font-size: var(--font-size);
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            pointer-events: none;
-            z-index: 1;
-        }
-
         textarea {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            padding: 10px;
-            font-family: var(--editor-font);
-            font-size: var(--font-size);
-            line-height: 1.6;
-            background: transparent;
-            color: transparent;
-            caret-color: var(--text);
-            resize: none;
+            min-height: 100%;
             border: none;
+            padding: 8px;
+            font-family: monospace;
+            font-size: var(--font-size);
+            line-height: 1.5;
+            background: var(--bg);
+            color: var(--text);
+            resize: none;
             outline: none;
             tab-size: 4;
             white-space: pre-wrap;
             word-wrap: break-word;
-            z-index: 2;
-            -webkit-text-fill-color: transparent;
+            display: block;
         }
 
-        /* Syntax Colors */
-        .syn-keyword { color: var(--syntax-keyword); }
-        .syn-string { color: var(--syntax-string); }
-        .syn-comment { color: var(--syntax-comment); font-style: italic; }
-        .syn-number { color: var(--syntax-number); }
-        .syn-function { color: var(--syntax-function); }
-        .syn-tag { color: var(--syntax-tag); }
-        .syn-attr { color: var(--syntax-attr); }
-        .syn-operator { color: var(--text); }
-
-        /* Toolbar - Sticky above keyboard */
+        /* Kompakt Toolbar */
         #toolbar-container {
             position: fixed;
             left: 0;
@@ -187,50 +185,60 @@
             background: var(--header);
             border-top: 1px solid var(--border);
             z-index: 1000;
-            transition: transform 0.2s;
             padding-bottom: env(safe-area-inset-bottom);
+            transition: transform 0.2s ease;
         }
 
         #toolbar {
-            height: 44px;
+            height: 38px;
             display: flex;
-            gap: 6px;
-            padding: 6px;
+            gap: 4px;
+            padding: 4px 6px;
             overflow-x: auto;
             scrollbar-width: none;
         }
         #toolbar::-webkit-scrollbar { display: none; }
 
         .tool-btn {
-            height: 32px;
-            padding: 0 12px;
+            height: 30px;
+            padding: 0 10px;
             background: #3c3c3c;
             border: 1px solid #505050;
             color: white;
-            border-radius: 6px;
+            border-radius: 4px;
             font-family: monospace;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             white-space: nowrap;
+            min-width: 32px;
         }
         .tool-btn:active { background: var(--accent); }
 
-        /* Floating Nav */
+        /* Floating Nav - Daha küçük */
         #float-nav {
             position: fixed;
-            right: 12px;
-            bottom: calc(60px + env(safe-area-inset-bottom));
+            right: 10px;
+            bottom: calc(50px + env(safe-area-inset-bottom));
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             z-index: 999;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
         }
         .nav-btn {
-            width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: white;
-            border: none; font-size: 18px; cursor: pointer; opacity: 0.9;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            display: flex; align-items: center; justify-content: center;
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            background: var(--accent); 
+            color: white;
+            border: none; 
+            font-size: 16px; 
+            cursor: pointer; 
+            opacity: 0.9;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
         .nav-btn:active { opacity: 1; transform: scale(0.95); }
 
@@ -240,12 +248,12 @@
 
         #menu {
             position: fixed;
-            top: calc(env(safe-area-inset-top) + 50px);
-            right: 12px;
+            top: calc(env(safe-area-inset-top) + 45px);
+            right: 10px;
             background: #2d2d2d;
             border: 1px solid var(--border);
             border-radius: 12px;
-            min-width: 220px;
+            min-width: 200px;
             max-height: 80vh;
             overflow-y: auto;
             display: none;
@@ -256,8 +264,8 @@
         #menu.show { display: flex; }
 
         .menu-item {
-            padding: 14px 16px;
-            font-size: 15px;
+            padding: 12px 14px;
+            font-size: 14px;
             background: transparent;
             border: none;
             border-bottom: 1px solid var(--border);
@@ -272,9 +280,9 @@
         .menu-item:active { background: var(--accent); }
         .menu-item.red { color: #ff6b6b; }
         .menu-item.red:active { background: #ff6b6b; color: white; }
-        .key-hint { font-size: 12px; color: var(--text-muted); margin-left: auto; padding-left: 20px; }
+        .key-hint { font-size: 11px; color: var(--text-muted); margin-left: auto; padding-left: 16px; }
 
-        /* Search */
+        /* Search - Daha kompakt */
         #search-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 3000; }
         #search-overlay.show { display: block; }
 
@@ -287,7 +295,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
-            width: 85%;
+            width: 90%;
             max-width: 320px;
             display: none;
             flex-direction: column;
@@ -296,15 +304,41 @@
         }
         #search-box.show { display: flex; }
 
-        .search-input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 15px; }
-        .search-row { display: flex; gap: 8px; margin-top: 4px; }
-        .search-btn { flex: 1; padding: 10px 8px; background: #3c3c3c; border: 1px solid #505050; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .search-input { 
+            width: 100%; 
+            padding: 10px; 
+            background: var(--bg); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            color: white; 
+            font-size: 15px; 
+        }
+        .search-row { display: flex; gap: 6px; margin-top: 4px; }
+        .search-btn { 
+            flex: 1; 
+            padding: 10px 6px; 
+            background: #3c3c3c; 
+            border: 1px solid #505050; 
+            color: white; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 13px; 
+        }
         .search-btn.primary { background: var(--accent); }
 
         /* Preview */
         #preview-modal { position: fixed; inset: 0; background: white; display: none; flex-direction: column; z-index: 4000; }
         #preview-modal.show { display: flex; }
-        #preview-header { height: 50px; background: var(--header); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; padding-top: env(safe-area-inset-top); }
+        #preview-header { 
+            height: 48px; 
+            background: var(--header); 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 16px; 
+            padding-top: env(safe-area-inset-top); 
+        }
         #preview-frame { flex: 1; border: none; background: white; }
 
         input[type="file"] { display: none; }
@@ -324,13 +358,13 @@
 
         <div id="editor-container">
             <div id="line-numbers">1</div>
-            <div class="editor-wrapper">
-                <div id="code-display"></div>
+            <div id="editor-wrapper">
                 <textarea id="editor" spellcheck="false" autocapitalize="off"></textarea>
             </div>
         </div>
     </div>
 
+    <!-- Kompakt Toolbar -->
     <div id="toolbar-container">
         <div id="toolbar">
             <button class="tool-btn" data-char="\t">Tab</button>
@@ -348,6 +382,7 @@
         </div>
     </div>
 
+    <!-- Navigasyon -->
     <div id="float-nav">
         <button class="nav-btn" data-nav="top">⤒</button>
         <button class="nav-btn" data-nav="up">↑</button>
@@ -379,8 +414,8 @@
         <input type="text" class="search-input" id="replace-text" placeholder="Değiştir...">
         <div class="search-row">
             <button class="search-btn" id="close-search">Kapat</button>
-            <button class="search-btn" id="find-prev">← Önceki</button>
-            <button class="search-btn primary" id="find-next">Sonraki →</button>
+            <button class="search-btn" id="find-prev">Önceki</button>
+            <button class="search-btn primary" id="find-next">Sonraki</button>
         </div>
         <div class="search-row">
             <button class="search-btn" id="replace-one">Değiştir</button>
@@ -389,7 +424,10 @@
     </div>
 
     <div id="preview-modal">
-        <div id="preview-header"><b>Önizleme</b><button class="icon-btn" id="close-preview">Kapat</button></div>
+        <div id="preview-header">
+            <b>Önizleme</b>
+            <button class="icon-btn" id="close-preview">Kapat</button>
+        </div>
         <iframe id="preview-frame"></iframe>
     </div>
 
@@ -408,8 +446,8 @@
             counter: 0,
             history: new Map(),
             zipFile: null,
-            fontSizes: [12, 14, 16, 18, 20],
-            fontIndex: 1,
+            fontSizes: [12, 13, 14, 15, 16, 18],
+            fontIndex: 2,
 
             init() {
                 this.cacheElements();
@@ -421,10 +459,9 @@
             cacheElements() {
                 this.el = {
                     editor: document.getElementById('editor'),
-                    codeDisplay: document.getElementById('code-display'),
+                    lineNumbers: document.getElementById('line-numbers'),
                     filename: document.getElementById('filename'),
                     tabsContainer: document.getElementById('tabs-container'),
-                    lineNumbers: document.getElementById('line-numbers'),
                     toolbarContainer: document.getElementById('toolbar-container'),
                     floatNav: document.getElementById('float-nav'),
                     menu: document.getElementById('menu'),
@@ -441,16 +478,13 @@
             },
 
             setupKeyboardTracking() {
-                // iOS/Android klavye takibi
                 if (window.visualViewport) {
                     window.visualViewport.addEventListener('resize', () => {
                         const keyboardHeight = window.innerHeight - window.visualViewport.height;
                         if (keyboardHeight > 100) {
-                            // Klavye açık
                             this.el.toolbarContainer.style.transform = `translateY(-${keyboardHeight}px)`;
                             this.el.floatNav.style.transform = `translateY(-${keyboardHeight}px)`;
                         } else {
-                            // Klavye kapalı
                             this.el.toolbarContainer.style.transform = 'translateY(0)';
                             this.el.floatNav.style.transform = 'translateY(0)';
                         }
@@ -459,20 +493,21 @@
             },
 
             bindEvents() {
+                // Sekme olayları
                 document.getElementById('new-tab-btn').addEventListener('click', () => this.newTab());
-                document.getElementById('menu-btn').addEventListener('click', () => this.toggleMenu());
-                document.getElementById('preview-btn').addEventListener('click', () => this.togglePreview());
-                document.getElementById('close-preview').addEventListener('click', () => this.togglePreview());
-                this.el.menuOverlay.addEventListener('click', () => this.toggleMenu());
-
+                
                 this.el.filename.addEventListener('change', (e) => {
                     const tab = this.getActiveTab();
                     if(tab) { tab.name = e.target.value; this.renderTabs(); }
                 });
 
-                // Editor input with syntax highlighting
+                // Editor scroll senkronizasyonu
+                this.el.editor.addEventListener('scroll', () => {
+                    this.el.lineNumbers.scrollTop = this.el.editor.scrollTop;
+                });
+
                 this.el.editor.addEventListener('input', () => {
-                    this.updateContent();
+                    this.updateLineNumbers();
                     const tab = this.getActiveTab();
                     if(tab) {
                         tab.content = this.el.editor.value;
@@ -480,11 +515,6 @@
                     }
                     clearTimeout(this.historyTimer);
                     this.historyTimer = setTimeout(() => this.saveHistory(), 400);
-                });
-
-                this.el.editor.addEventListener('scroll', () => {
-                    this.el.codeDisplay.scrollTop = this.el.editor.scrollTop;
-                    this.el.lineNumbers.scrollTop = this.el.editor.scrollTop;
                 });
 
                 // Toolbar
@@ -495,7 +525,7 @@
                     });
                 });
 
-                // Floating nav
+                // Navigasyon
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -503,24 +533,31 @@
                     });
                 });
 
-                // Menu actions
+                // Menü
+                document.getElementById('menu-btn').addEventListener('click', () => this.toggleMenu());
+                this.el.menuOverlay.addEventListener('click', () => this.toggleMenu());
+                
                 this.el.menu.addEventListener('click', (e) => {
                     const item = e.target.closest('.menu-item');
                     if(item) this.handleAction(item.dataset.action);
                 });
 
-                // Search
+                // Önizleme
+                document.getElementById('preview-btn').addEventListener('click', () => this.togglePreview());
+                document.getElementById('close-preview').addEventListener('click', () => this.togglePreview());
+
+                // Arama
                 document.getElementById('close-search').addEventListener('click', () => this.closeSearch());
                 document.getElementById('find-next').addEventListener('click', () => this.findNext());
                 document.getElementById('find-prev').addEventListener('click', () => this.findPrev());
                 document.getElementById('replace-one').addEventListener('click', () => this.replaceOne());
                 document.getElementById('replace-all').addEventListener('click', () => this.replaceAll());
 
-                // Files
+                // Dosyalar
                 this.el.fileInput.addEventListener('change', (e) => this.handleFile(e.target.files[0]));
                 this.el.zipInput.addEventListener('change', (e) => this.handleZip(e.target.files[0]));
 
-                // Shortcuts
+                // Kısayollar
                 document.addEventListener('keydown', (e) => {
                     if(e.key === 'Tab') { e.preventDefault(); this.insertText('    '); }
                     if(e.ctrlKey || e.metaKey) {
@@ -531,65 +568,6 @@
                         if(e.key === 'y') { e.preventDefault(); this.redo(); }
                     }
                 });
-            },
-
-            // Syntax Highlighting
-            highlightCode(code) {
-                let html = code
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
-
-                // Comments
-                html = html.replace(/(\/\/.*$|\/\*[\s\S]*?\*\/|&lt;!--[\s\S]*?--&gt;)/gm, '<span class="syn-comment">$1</span>');
-                
-                // Strings
-                html = html.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '<span class="syn-string">$&</span>');
-                
-                // Keywords
-                html = html.replace(/\b(const|let|var|function|class|if|else|for|while|return|import|export|async|await|new|this|try|catch)\b/g, '<span class="syn-keyword">$1</span>');
-                
-                // Functions
-                html = html.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\()/g, '<span class="syn-function">$1</span>');
-                
-                // Numbers
-                html = html.replace(/\b\d+\b/g, '<span class="syn-number">$&</span>');
-                
-                // HTML Tags
-                html = html.replace(/(&lt;\/?)(\w+)(.*?)(&gt;)/g, '$1<span class="syn-tag">$2</span>$3$4');
-                
-                // Attributes
-                html = html.replace(/\b([a-zA-Z-]+)(=)/g, '<span class="syn-attr">$1</span>$2');
-
-                return html;
-            },
-
-            updateContent() {
-                const code = this.el.editor.value;
-                this.el.codeDisplay.innerHTML = this.highlightCode(code);
-                this.updateLineNumbers();
-            },
-
-            updateLineNumbers() {
-                const lines = this.el.editor.value.split('\n').length;
-                this.el.lineNumbers.innerHTML = Array(lines).fill(0).map((_,i) => i+1).join('<br>');
-            },
-
-            insertText(text) {
-                const ed = this.el.editor;
-                ed.setRangeText(text, ed.selectionStart, ed.selectionEnd, 'end');
-                ed.focus();
-                ed.dispatchEvent(new Event('input'));
-            },
-
-            navigate(dir) {
-                const ed = this.el.editor;
-                switch(dir) {
-                    case 'top': ed.scrollTop = 0; ed.setSelectionRange(0,0); break;
-                    case 'bottom': ed.scrollTop = ed.scrollHeight; const len=ed.value.length; ed.setSelectionRange(len,len); break;
-                    case 'up': ed.scrollBy({top: -200, behavior: 'smooth'}); break;
-                    case 'down': ed.scrollBy({top: 200, behavior: 'smooth'}); break;
-                }
             },
 
             newTab(name='new.txt', content='') {
@@ -607,7 +585,7 @@
                 const tab = this.tabs.find(t => t.id === id);
                 this.el.editor.value = tab.content;
                 this.el.filename.value = tab.name;
-                this.updateContent();
+                this.updateLineNumbers();
                 this.renderTabs();
             },
 
@@ -641,6 +619,28 @@
 
             getActiveTab() { return this.tabs.find(t => t.id === this.activeTab); },
 
+            updateLineNumbers() {
+                const lines = this.el.editor.value.split('\n').length;
+                this.el.lineNumbers.innerHTML = Array(lines).fill(0).map((_,i) => i+1).join('<br>');
+            },
+
+            insertText(text) {
+                const ed = this.el.editor;
+                ed.setRangeText(text, ed.selectionStart, ed.selectionEnd, 'end');
+                ed.focus();
+                ed.dispatchEvent(new Event('input'));
+            },
+
+            navigate(dir) {
+                const ed = this.el.editor;
+                switch(dir) {
+                    case 'top': ed.scrollTop = 0; ed.setSelectionRange(0,0); break;
+                    case 'bottom': ed.scrollTop = ed.scrollHeight; const len=ed.value.length; ed.setSelectionRange(len,len); break;
+                    case 'up': ed.scrollBy({top: -150, behavior: 'smooth'}); break;
+                    case 'down': ed.scrollBy({top: 150, behavior: 'smooth'}); break;
+                }
+            },
+
             saveHistory() {
                 const tab = this.getActiveTab();
                 if(!tab) return;
@@ -660,7 +660,7 @@
                     h.index--;
                     this.el.editor.value = h.stack[h.index];
                     tab.content = h.stack[h.index];
-                    this.updateContent();
+                    this.updateLineNumbers();
                 }
             },
 
@@ -672,7 +672,7 @@
                     h.index++;
                     this.el.editor.value = h.stack[h.index];
                     tab.content = h.stack[h.index];
-                    this.updateContent();
+                    this.updateLineNumbers();
                 }
             },
 
@@ -698,7 +698,7 @@
                     case 'copy': this.copy(); break;
                     case 'cut': this.cut(); break;
                     case 'paste': this.paste(); break;
-                    case 'clear': if(confirm('Tüm içerik silinsin mi?')) { this.el.editor.value=''; this.updateContent(); } break;
+                    case 'clear': if(confirm('Tüm içerik silinsin mi?')) { this.el.editor.value=''; this.updateLineNumbers(); } break;
                 }
             },
 
@@ -773,8 +773,7 @@
                 if(idx === -1) return;
                 ed.setSelectionRange(idx, idx + text.length);
                 ed.focus();
-                ed.scrollTop = (content.substring(0, idx).split('\n').length - 1) * 22 - 100;
-                this.el.codeDisplay.scrollTop = ed.scrollTop;
+                ed.scrollTop = (content.substring(0, idx).split('\n').length - 1) * 21 - 80;
             },
 
             findPrev() {
@@ -812,7 +811,7 @@
                     if(name.match(/\.html?$/i)) {
                         this.el.previewFrame.srcdoc = content;
                     } else {
-                        this.el.previewFrame.srcdoc = `<pre style="padding:20px;font-family:monospace;white-space:pre-wrap">${content.replace(/</g, '&lt;')}</pre>`;
+                        this.el.previewFrame.srcdoc = `<pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word">${content.replace(/</g, '&lt;')}</pre>`;
                     }
                     this.el.previewModal.classList.add('show');
                 } else {
@@ -822,9 +821,7 @@
 
             changeFont() {
                 this.fontIndex = (this.fontIndex + 1) % this.fontSizes.length;
-                const size = this.fontSizes[this.fontIndex];
-                document.documentElement.style.setProperty('--font-size', size + 'px');
-                this.updateContent(); // Refresh display
+                document.documentElement.style.setProperty('--font-size', this.fontSizes[this.fontIndex] + 'px');
             },
 
             toggleTheme() {
