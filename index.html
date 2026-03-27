@@ -68,7 +68,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 70%;
+            max-width: 60%;
         }
 
         .btn-icon {
@@ -209,8 +209,8 @@
         .popup-window.active { display: flex; }
 
         /* Arama Popup */
-        #searchPopup input { padding: 8px; border-radius: 6px; border: 1px solid var(--ios-border); font-size: 16px; width: 150px; }
-        #searchPopup button { background: transparent; color: var(--ios-blue); border: none; font-size: 16px; cursor: pointer; }
+        #searchPopup input { padding: 8px; border-radius: 6px; border: 1px solid var(--ios-border); font-size: 16px; width: 140px; }
+        #searchPopup button { background: transparent; color: var(--ios-blue); border: none; font-size: 16px; cursor: pointer; padding: 0 5px; font-weight: bold;}
 
         /* Yazı Boyutu Popup */
         #fontSizePopup button {
@@ -252,13 +252,39 @@
         .ios-context-menu .divider { width: 1px; background-color: var(--ios-border); margin: 5px 0; }
 
         input[type="file"] { display: none; }
+
+        /* CANLI ÖNİZLEME (EKLENDİ) */
+        #previewOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ios-bg);
+            z-index: 6000;
+            flex-direction: column;
+        }
+        #previewHeader {
+            background-color: var(--ios-header);
+            padding: 12px 15px;
+            padding-top: max(15px, env(safe-area-inset-top)); 
+            border-bottom: 1px solid var(--ios-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--ios-text);
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="file-name" id="fileNameDisplay">İsimsiz.txt</div>
-        <button class="btn-icon" id="btnMenuToggle">•••</button>
+        <div style="display: flex; gap: 5px;">
+            <button class="btn-icon" id="btnRun">▶️</button>
+            <button class="btn-icon" id="btnMenuToggle">•••</button>
+        </div>
         
         <div class="dropdown-menu" id="mainMenu">
             <button id="menuOpen">Aç</button>
@@ -283,7 +309,8 @@
 
     <div class="popup-window" id="searchPopup">
         <input type="text" id="searchInput" placeholder="Kelime ara...">
-        <button id="btnSearchNext">Bul</button>
+        <button id="btnSearchPrev">▲</button>
+        <button id="btnSearchNext">▼</button>
         <button id="btnSearchClose" style="color: red;">Kapat</button>
     </div>
 
@@ -305,7 +332,17 @@
         <div class="divider"></div>
         <button id="ctxPaste">Yapıştır</button>
         <div class="divider"></div>
+        <button id="ctxDelete" style="color:red">Sil</button>
+        <div class="divider"></div>
         <button id="ctxSelectAll">Tümünü Seç</button>
+    </div>
+
+    <div id="previewOverlay">
+        <div id="previewHeader">
+            <b style="font-size: 17px;">Canlı Önizleme</b>
+            <button id="btnPreviewClose" style="background: red; color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kapat</button>
+        </div>
+        <iframe id="previewFrame" style="flex:1; width:100%; border:none; background:#ffffff;"></iframe>
     </div>
 
     <script>
@@ -328,6 +365,23 @@
         const fontSizeDisplay = document.getElementById('fontSizeDisplay');
 
         const iosMenu = document.getElementById('iosMenu');
+
+        // ÖNİZLEME ELEMENTLERİ (EKLENDİ)
+        const btnRun = document.getElementById('btnRun');
+        const previewOverlay = document.getElementById('previewOverlay');
+        const previewFrame = document.getElementById('previewFrame');
+        const btnPreviewClose = document.getElementById('btnPreviewClose');
+
+        btnRun.addEventListener('click', () => {
+            previewOverlay.style.display = 'flex';
+            previewFrame.srcdoc = editor.value;
+            mainMenu.classList.remove('active');
+        });
+
+        btnPreviewClose.addEventListener('click', () => {
+            previewOverlay.style.display = 'none';
+            previewFrame.srcdoc = '';
+        });
 
         // --- YAZI BOYUTU İŞLEMLERİ ---
         let currentFontSize = parseInt(localStorage.getItem('alpEditorFontSize')) || 16;
@@ -486,25 +540,14 @@
             fileInput.value = '';
         });
 
-        // --- DOSYA İNDİRME VE UZANTI DÜZELTME (YENİ) ---
+        // --- DOSYA İNDİRME VE UZANTI DÜZELTME ---
         function getMimeType(filename) {
-            // Dosya adından uzantıyı alır (örn: "abc.html" -> "html")
             const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
-            
-            // Uzantılara göre doğru tarayıcı tiplerini belirliyoruz
             const mimeTypes = {
-                'html': 'text/html',
-                'htm': 'text/html',
-                'js': 'text/javascript',
-                'css': 'text/css',
-                'json': 'application/json',
-                'md': 'text/markdown',
-                'csv': 'text/csv',
-                'xml': 'text/xml',
-                'txt': 'text/plain'
+                'html': 'text/html', 'htm': 'text/html', 'js': 'text/javascript',
+                'css': 'text/css', 'json': 'application/json', 'md': 'text/markdown',
+                'csv': 'text/csv', 'xml': 'text/xml', 'txt': 'text/plain'
             };
-            
-            // Eğer bilinen bir uzantıysa onu kullan, değilse "application/octet-stream" kullanarak .txt eklenmesini engelle
             return mimeTypes[ext] || 'application/octet-stream';
         }
 
@@ -579,7 +622,7 @@
             document.body.classList.add('dark-theme');
         }
 
-        // --- ARAMA İŞLEMLERİ ---
+        // --- GELİŞMİŞ ARAMA İŞLEMLERİ (İLERİ / GERİ EKLENDİ) ---
         let lastSearchIndex = 0;
 
         function showSearch() {
@@ -594,22 +637,33 @@
             lastSearchIndex = 0;
         });
 
-        document.getElementById('btnSearchNext').addEventListener('click', () => {
+        function performSearch(forward) {
             const text = editor.value.toLowerCase();
             const word = searchInput.value.toLowerCase();
             if (!word) return;
 
-            const foundIndex = text.indexOf(word, lastSearchIndex);
+            let foundIndex;
+            if (forward) {
+                foundIndex = text.indexOf(word, lastSearchIndex);
+                if (foundIndex === -1) foundIndex = text.indexOf(word); // Başa dön
+            } else {
+                let searchBefore = lastSearchIndex - word.length - 1;
+                if (searchBefore < 0) searchBefore = text.length;
+                foundIndex = text.lastIndexOf(word, searchBefore);
+                if (foundIndex === -1) foundIndex = text.lastIndexOf(word); // Sona dön
+            }
             
             if (foundIndex !== -1) {
                 editor.focus();
                 editor.setSelectionRange(foundIndex, foundIndex + word.length);
                 lastSearchIndex = foundIndex + word.length;
             } else {
-                lastSearchIndex = 0; 
-                alert("Metin sonuna ulaşıldı veya kelime bulunamadı.");
+                alert("Kelime bulunamadı.");
             }
-        });
+        }
+
+        document.getElementById('btnSearchNext').addEventListener('click', () => performSearch(true));
+        document.getElementById('btnSearchPrev').addEventListener('click', () => performSearch(false));
 
         // --- BASILI TUTMA MENÜSÜ ---
         editor.addEventListener('contextmenu', (e) => {
@@ -623,6 +677,24 @@
             iosMenu.style.top = `${y}px`;
             iosMenu.classList.add('active');
         });
+
+        // Mobilde basılı tutma tespiti (EKLENDİ)
+        let touchTimer;
+        editor.addEventListener('touchstart', (e) => {
+            touchTimer = setTimeout(() => {
+                const touch = e.touches[0];
+                let x = touch.pageX;
+                let y = touch.pageY - 50;
+                if (x + 300 > window.innerWidth) x = window.innerWidth - 300;
+                if (y < 10) y = touch.pageY + 20;
+
+                iosMenu.style.left = `${x}px`;
+                iosMenu.style.top = `${y}px`;
+                iosMenu.classList.add('active');
+            }, 600); // 600ms basılı tutunca açılır
+        });
+        editor.addEventListener('touchend', () => clearTimeout(touchTimer));
+        editor.addEventListener('touchmove', () => clearTimeout(touchTimer));
 
         document.addEventListener('click', (e) => {
             if (!iosMenu.contains(e.target) && e.target !== editor) {
@@ -657,6 +729,16 @@
                 editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
                 editor.dispatchEvent(new Event('input'));
             } catch (e) { alert("Pano izni yok."); }
+            iosMenu.classList.remove('active');
+        });
+
+        // SİL İŞLEMİ (EKLENDİ)
+        document.getElementById('ctxDelete').addEventListener('click', () => {
+            const start = editor.selectionStart, end = editor.selectionEnd;
+            if (start !== end) {
+                editor.setRangeText('', start, end, 'end');
+                editor.dispatchEvent(new Event('input'));
+            }
             iosMenu.classList.remove('active');
         });
 
