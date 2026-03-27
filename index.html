@@ -5,381 +5,1568 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>AlpEditör</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>AlpEditör Pro</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        /* Varsayılan (Açık) iOS Stili */
+        * { 
+            touch-action: manipulation; 
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
         :root {
-            --ios-bg: #f2f2f7; --ios-header: #f8f8f8; --ios-blue: #007AFF;
-            --ios-border: #c6c6c8; --ios-text: #000000; --ios-menu-bg: rgba(250, 250, 250, 0.95);
-            --ios-tab-bg: #e5e5ea; --ios-tab-active: #ffffff; --ios-line-num: #8e8e93;
-            --editor-font-size: 16px; 
+            --ios-bg: #f2f2f7;
+            --ios-header: #f8f8f8;
+            --ios-blue: #007AFF;
+            --ios-border: #c6c6c8;
+            --ios-text: #000000;
+            --ios-menu-bg: rgba(250, 250, 250, 0.95);
+            --ios-tab-bg: #e5e5ea;
+            --ios-tab-active: #ffffff;
+            --ios-line-num: #8e8e93;
+            --ios-red: #ff3b30;
+            --editor-font-size: 16px;
+            --editor-font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
         }
 
-        /* Karanlık Tema */
         body.dark-theme {
-            --ios-bg: #000000; --ios-header: #1c1c1e; --ios-blue: #0a84ff;
-            --ios-border: #38383a; --ios-text: #ffffff; --ios-menu-bg: rgba(40, 40, 40, 0.95);
-            --ios-tab-bg: #2c2c2e; --ios-tab-active: #000000; --ios-line-num: #636366;
+            --ios-bg: #1c1c1e;
+            --ios-header: #2c2c2e;
+            --ios-blue: #0a84ff;
+            --ios-border: #38383a;
+            --ios-text: #ffffff;
+            --ios-menu-bg: rgba(44, 44, 46, 0.95);
+            --ios-tab-bg: #3a3a3c;
+            --ios-tab-active: #1c1c1e;
+            --ios-line-num: #636366;
         }
 
-        /* ZOOM (SAYFA BÜYÜMESİ) ENGELLENDİ: touch-action eklendi */
-        * { touch-action: manipulation; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
+        /* Header */
+        header {
+            background-color: var(--ios-header);
+            border-bottom: 1px solid var(--ios-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            padding-top: max(12px, env(safe-area-inset-top));
+            position: relative;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
 
-        /* Üst Çentik Alanı ve Header */
-        header { background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; padding-top: max(15px, env(safe-area-inset-top)); position: relative; z-index: 100; }
-        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
-        .btn-icon { color: var(--ios-blue); background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
+        .file-name {
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 50%;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
 
-        /* 3 Nokta Menüsü (Yüksekliği Sınırlandı, Kaydırılabilir) */
-        .dropdown-menu { position: absolute; top: calc(100% + 5px); right: 10px; background-color: var(--ios-menu-bg); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; overflow-y: auto; max-height: 70vh; border: 1px solid var(--ios-border); }
-        .dropdown-menu.active { display: flex; }
-        .dropdown-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; width: 170px; cursor: pointer; }
-        .dropdown-menu button:last-child { border-bottom: none; }
-        .dropdown-menu button:active { background-color: rgba(128,128,128,0.2); }
+        .file-name:active {
+            background-color: rgba(128,128,128,0.2);
+        }
 
-        /* Sekmeler Alanı */
-        .tabs-container { display: flex; background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
-        .tabs-container::-webkit-scrollbar { display: none; } 
-        .tab { padding: 10px 15px; font-size: 14px; color: var(--ios-text); background-color: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .tab.active { background-color: var(--ios-tab-active); font-weight: 600; }
-        .tab-close { color: var(--ios-line-num); font-weight: bold; padding: 2px; }
-        .add-tab-btn { padding: 10px 15px; background: transparent; border: none; color: var(--ios-blue); font-size: 20px; cursor: pointer; }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
 
-        /* Editör ve Satır Numaraları */
-        .editor-wrapper { display: flex; flex: 1; overflow: hidden; background-color: var(--ios-tab-active); }
+        .btn-icon {
+            color: var(--ios-blue);
+            background: transparent;
+            border: none;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 6px;
+            line-height: 1;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+        }
+
+        .btn-icon:active {
+            background-color: rgba(128,128,128,0.2);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 10px;
+            background-color: var(--ios-menu-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 70vh;
+            border: 1px solid var(--ios-border);
+            z-index: 1000;
+            min-width: 180px;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .menu-group {
+            border-bottom: 1px solid var(--ios-border);
+        }
+
+        .menu-group:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu button {
+            background: transparent;
+            border: none;
+            padding: 12px 16px;
+            font-size: 15px;
+            color: var(--ios-blue);
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .dropdown-menu button:active {
+            background-color: rgba(128,128,128,0.2);
+        }
+
+        .dropdown-menu button.danger {
+            color: var(--ios-red);
+        }
+
+        .shortcut {
+            font-size: 12px;
+            color: var(--ios-line-num);
+            opacity: 0.8;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            background-color: var(--ios-header);
+            border-bottom: 1px solid var(--ios-border);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tabs-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        #tabsList {
+            display: flex;
+        }
+
+        .tab {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--ios-text);
+            background-color: var(--ios-tab-bg);
+            border-right: 1px solid var(--ios-border);
+            white-space: nowrap;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 150px;
+            position: relative;
+            user-select: none;
+        }
+
+        .tab.active {
+            background-color: var(--ios-tab-active);
+            font-weight: 600;
+        }
+
+        .tab-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .tab-close {
+            color: var(--ios-line-num);
+            font-weight: bold;
+            padding: 2px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .tab-close:active {
+            background-color: rgba(255,59,48,0.2);
+            color: var(--ios-red);
+        }
+
+        .add-tab-btn {
+            padding: 10px 14px;
+            background: transparent;
+            border: none;
+            color: var(--ios-blue);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-tab-btn:active {
+            background-color: rgba(128,128,128,0.1);
+        }
+
+        /* Editor Wrapper */
+        .editor-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            background-color: var(--ios-tab-active);
+            position: relative;
+        }
+
         .line-numbers {
-            width: 30px; /* ALAN VERİMLİLİĞİ İÇİN İNCELTİLDİ */
-            padding: 15px 3px; font-family: monospace; font-size: 13px; /* KÜÇÜLTÜLDÜ */
-            line-height: 1.5; color: var(--ios-line-num); text-align: right; background-color: var(--ios-header); border-right: 1px solid var(--ios-border); overflow: hidden; user-select: none;
+            width: 40px;
+            padding: 12px 4px;
+            font-family: var(--editor-font-family);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--ios-line-num);
+            text-align: right;
+            background-color: var(--ios-header);
+            border-right: 1px solid var(--ios-border);
+            overflow: hidden;
+            user-select: none;
+            opacity: 0.8;
         }
 
-        /* TEXTAREA GÜVENLİ: user-select KESİNLİKLE text */
         textarea {
-            flex: 1; width: 100%; border: none; padding: 15px; font-size: var(--editor-font-size); line-height: 1.5; font-family: monospace; background-color: transparent; color: var(--ios-text); resize: none; outline: none; box-sizing: border-box; -webkit-appearance: none; overflow-y: auto; white-space: pre;
-            -webkit-user-select: text !important; user-select: text !important; /* GÜVENLİK */
+            flex: 1;
+            width: 100%;
+            border: none;
+            padding: 12px;
+            font-size: var(--editor-font-size);
+            line-height: 1.6;
+            font-family: var(--editor-font-family);
+            background-color: transparent;
+            color: var(--ios-text);
+            resize: none;
+            outline: none;
+            -webkit-appearance: none;
+            overflow-y: auto;
+            white-space: pre;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            user-select: text;
+            caret-color: var(--ios-blue);
         }
 
-        /* ALT TOOLBAR (KODLAMA ÇUBUĞU) */
-        .toolbar { display: flex; background-color: var(--ios-header); border-top: 1px solid var(--ios-border); overflow-x: auto; padding: 8px; gap: 6px; scrollbar-width: none; }
-        .toolbar::-webkit-scrollbar { display: none; }
-        .toolbar button { background-color: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 8px; padding: 10px; min-width: 44px; font-family: monospace; font-size: 15px; cursor: pointer; }
+        textarea::selection {
+            background-color: rgba(0,122,255,0.3);
+        }
 
-        /* Ortak Popup Stilleri */
-        .popup-window { position: absolute; top: max(60px, calc(env(safe-area-inset-top) + 50px)); left: 50%; transform: translateX(-50%); background-color: var(--ios-menu-bg); padding: 10px; border-radius: 10px; display: none; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 200; border: 1px solid var(--ios-border); align-items: center; }
-        .popup-window.active { display: flex; }
-        #searchPopup input { padding: 8px; border-radius: 6px; border: 1px solid var(--ios-border); font-size: 16px; width: 140px; }
-        #searchPopup button { background: transparent; color: var(--ios-blue); border: none; font-size: 16px; cursor: pointer; padding: 0 5px; font-weight: bold;}
-        #fontSizePopup button { background: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 6px; font-size: 20px; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        #fontSizePopup .close-btn { background: transparent; color: red; border: none; font-size: 16px; width: auto; height: auto; padding: 0 10px;}
-        .font-size-value { font-size: 16px; font-weight: bold; width: 45px; text-align: center; color: var(--ios-text); }
+        body.dark-theme textarea::selection {
+            background-color: rgba(10,132,255,0.4);
+        }
 
-        /* CANLI ÖNİZLEME OVERLAY (EKLENDİ) */
-        #previewOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--ios-bg); z-index: 6000; flex-direction: column; }
-        #previewHeader { background-color: var(--ios-header); padding: 12px 15px; padding-top: max(15px, env(safe-area-inset-top)); border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; color: var(--ios-text); }
-        input[type="file"] { display: none; }
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            background-color: var(--ios-header);
+            border-top: 1px solid var(--ios-border);
+            overflow-x: auto;
+            padding: 8px;
+            gap: 6px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .toolbar button {
+            background-color: var(--ios-tab-bg);
+            color: var(--ios-text);
+            border: 1px solid var(--ios-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            min-width: 40px;
+            height: 40px;
+            font-family: var(--editor-font-family);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            white-space: nowrap;
+        }
+
+        .toolbar button:active {
+            background-color: var(--ios-blue);
+            color: white;
+            transform: scale(0.95);
+        }
+
+        /* Popups */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.3);
+            display: none;
+            z-index: 200;
+            backdrop-filter: blur(2px);
+        }
+
+        .popup-overlay.active {
+            display: block;
+        }
+
+        .popup-window {
+            position: absolute;
+            top: max(60px, calc(env(safe-area-inset-top) + 50px));
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--ios-menu-bg);
+            padding: 16px;
+            border-radius: 14px;
+            display: none;
+            gap: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 201;
+            border: 1px solid var(--ios-border);
+            flex-direction: column;
+            min-width: 280px;
+            max-width: 90vw;
+        }
+
+        .popup-window.active {
+            display: flex;
+            animation: popIn 0.2s ease-out;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translateX(-50%) scale(0.95); }
+            to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        .popup-header {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--ios-text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .popup-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--ios-border);
+            font-size: 16px;
+            background-color: var(--ios-tab-active);
+            color: var(--ios-text);
+            font-family: inherit;
+        }
+
+        .popup-input:focus {
+            outline: none;
+            border-color: var(--ios-blue);
+        }
+
+        .popup-btn {
+            background: transparent;
+            color: var(--ios-blue);
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 8px 12px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .popup-btn:active {
+            background-color: rgba(128,128,128,0.2);
+        }
+
+        .popup-btn.secondary {
+            color: var(--ios-text);
+            opacity: 0.8;
+        }
+
+        .popup-btn.danger {
+            color: var(--ios-red);
+        }
+
+        /* Font Size Popup Specifics */
+        .font-size-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+        }
+
+        .font-size-btn {
+            background-color: var(--ios-tab-bg);
+            border: 1px solid var(--ios-border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--ios-blue);
+        }
+
+        .font-size-btn:active {
+            background-color: var(--ios-blue);
+            color: white;
+        }
+
+        .font-size-value {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Preview Overlay */
+        #previewOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ios-bg);
+            z-index: 6000;
+            flex-direction: column;
+        }
+
+        #previewOverlay.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #previewHeader {
+            background-color: var(--ios-header);
+            padding: 12px 16px;
+            padding-top: max(12px, env(safe-area-inset-top));
+            border-bottom: 1px solid var(--ios-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--ios-text);
+        }
+
+        #previewFrame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #ffffff;
+        }
+
+        .preview-btn {
+            background-color: var(--ios-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .preview-btn:active {
+            opacity: 0.8;
+        }
+
+        /* Status Bar (Auto-save indicator) */
+        .status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--ios-header);
+            border-top: 1px solid var(--ios-border);
+            padding: 4px 12px;
+            font-size: 11px;
+            color: var(--ios-line-num);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .status-bar.visible {
+            opacity: 1;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 5000;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .line-numbers {
+                width: 32px;
+                font-size: 12px;
+                padding: 12px 2px;
+            }
+            textarea {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+            .toolbar button {
+                padding: 8px;
+                min-width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
-<body class="dark-theme"> <header>
-        <div class="file-name" id="fileNameDisplay">new.txt</div>
-        <div style="display: flex; gap: 5px;">
-            <button class="btn-icon" id="btnPreviewPlay" title="Önizleme">▶️</button>
-            <button class="btn-icon" id="btnMenuToggle">•••</button>
+<body class="dark-theme">
+    <header>
+        <div class="file-name" id="fileNameDisplay" title="Yeniden adlandırmak için tıklayın">new.txt</div>
+        <div class="header-actions">
+            <button class="btn-icon" id="btnPreviewPlay" title="Canlı Önizleme (Ctrl+P)">▶️</button>
+            <button class="btn-icon" id="btnMenuToggle" title="Menü">•••</button>
         </div>
         
         <div class="dropdown-menu" id="mainMenu">
-            <button id="menuOpen">Aç</button>
-            <button id="menuSave">Kaydet</button>
-            <button id="menuSaveAs">Farklı Kaydet</button>
-            <button id="menuUndo">Geri Al</button>
-            <button id="menuRedo">İleri Al</button>
-            <button id="menuPreviewText">Canlı Önizleme</button> <button id="menuFontSize">Yazı Boyutu</button> 
-            <button id="menuTheme">Tema Değiştir</button>
-            <div style="height:1px; background-color:var(--ios-border); margin:2px 0;"></div>
-            <button id="menuSearchText">Ara</button>
-            <button id="menuCutText">Kes</button>
-            <button id="menuCopyText">Kopyala</button>
-            <button id="menuPasteText">Yapıştır</button>
-            <button id="menuDeleteText" style="color:red">Sil</button>
-            <button id="menuSelectAllText">Tümünü Seç</button>
+            <div class="menu-group">
+                <button id="menuOpen"><span>Aç...</span> <span class="shortcut">Ctrl+O</span></button>
+                <button id="menuSave"><span>Kaydet</span> <span class="shortcut">Ctrl+S</span></button>
+                <button id="menuSaveAs"><span>Farklı Kaydet</span> <span class="shortcut">⇧Ctrl+S</span></button>
+            </div>
+            <div class="menu-group">
+                <button id="menuUndo"><span>Geri Al</span> <span class="shortcut">Ctrl+Z</span></button>
+                <button id="menuRedo"><span>İleri Al</span> <span class="shortcut">Ctrl+Y</span></button>
+            </div>
+            <div class="menu-group">
+                <button id="menuSearchText"><span>Bul / Değiştir</span> <span class="shortcut">Ctrl+F</span></button>
+                <button id="menuFontSize">Yazı Boyutu</button>
+                <button id="menuTheme">Tema Değiştir</button>
+            </div>
+            <div class="menu-group">
+                <button id="menuCutText">Kes</button>
+                <button id="menuCopyText">Kopyala</button>
+                <button id="menuPasteText">Yapıştır</button>
+                <button id="menuSelectAllText">Tümünü Seç</button>
+                <button id="menuDeleteText" class="danger">Sil</button>
+            </div>
         </div>
     </header>
 
     <div class="tabs-container">
-        <div id="tabsList" style="display:flex;"></div>
-        <button class="add-tab-btn" id="btnAddTab">+</button>
+        <div id="tabsList"></div>
+        <button class="add-tab-btn" id="btnAddTab" title="Yeni Sekme">+</button>
     </div>
 
     <div class="editor-wrapper">
         <div class="line-numbers" id="lineNumbers">1</div>
-        <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="none" wrap="off"></textarea>
+        <textarea id="editor" 
+            spellcheck="false" 
+            autocomplete="off" 
+            autocorrect="off" 
+            autocapitalize="none" 
+            wrap="off"
+            placeholder="Kodunuzu buraya yazın..."></textarea>
+        <div class="status-bar" id="statusBar">
+            <span id="cursorPos">Ln 1, Col 1</span>
+            <span id="saveStatus">Kaydedildi</span>
+        </div>
     </div>
 
     <div class="toolbar">
-        <button onclick="insertText('\t')">TAB</button><button onclick="insertText('<')">&lt;</button><button onclick="insertText('>')">&gt;</button><button onclick="insertText('/')">/</button><button onclick="insertText('{')">{</button><button onclick="insertText('}')">}</button><button onclick="insertText(';')">;</button><button onclick="insertText('=')">=</button>
+        <button onclick="insertChar('\t')" title="Girinti (Tab)">TAB</button>
+        <button onclick="insertChar('<')">&lt;</button>
+        <button onclick="insertChar('>')">&gt;</button>
+        <button onclick="insertChar('/')">/</button>
+        <button onclick="insertChar('{')">{</button>
+        <button onclick="insertChar('}')">}</button>
+        <button onclick="insertChar(';')">;</button>
+        <button onclick="insertChar('=')">=</button>
+        <button onclick="insertChar('(')">(</button>
+        <button onclick="insertChar(')')">)</button>
+        <button onclick="insertChar('[')">[</button>
+        <button onclick="insertChar(']')">]</button>
+        <button onclick="insertChar('"')>"</button>
+        <button onclick="insertChar("'")>'</button>
     </div>
 
+    <!-- Search/Replace Popup -->
+    <div class="popup-overlay" id="searchOverlay"></div>
     <div class="popup-window" id="searchPopup">
-        <input type="text" id="searchInput" placeholder="Kelime ara...">
-        <button id="btnSearchPrev">▲</button><button id="btnSearchNext">▼</button><button id="btnSearchClose" style="color: red;">Kapat</button>
+        <div class="popup-header">
+            <span>Bul ve Değiştir</span>
+            <button class="popup-btn secondary" id="btnSearchClose">Kapat</button>
+        </div>
+        <div class="popup-row">
+            <input type="text" class="popup-input" id="searchInput" placeholder="Ara...">
+        </div>
+        <div class="popup-row">
+            <input type="text" class="popup-input" id="replaceInput" placeholder="Değiştir (isteğe bağlı)...">
+        </div>
+        <div class="popup-row" style="justify-content: space-between; margin-top: 8px;">
+            <div>
+                <button class="popup-btn" id="btnSearchPrev">◀ Önceki</button>
+                <button class="popup-btn" id="btnSearchNext">Sonraki ▶</button>
+            </div>
+            <button class="popup-btn danger" id="btnReplaceAll">Tümünü Değiştir</button>
+        </div>
     </div>
 
+    <!-- Font Size Popup -->
     <div class="popup-window" id="fontSizePopup">
-        <button id="btnFontDec">-</button><span class="font-size-value" id="fontSizeDisplay">16px</span><button id="btnFontInc">+</button><button class="close-btn" id="btnFontClose">Kapat</button>
+        <div class="popup-header">
+            <span>Yazı Boyutu</span>
+            <button class="popup-btn secondary" id="btnFontClose">Kapat</button>
+        </div>
+        <div class="font-size-controls">
+            <button class="font-size-btn" id="btnFontDec">−</button>
+            <span class="font-size-value" id="fontSizeDisplay">16px</span>
+            <button class="font-size-btn" id="btnFontInc">+</button>
+        </div>
     </div>
 
-    <input type="file" id="fileInput" accept=".txt,.html,.js,.css,.json,.md,.csv">
+    <!-- Rename File Popup -->
+    <div class="popup-window" id="renamePopup">
+        <div class="popup-header">
+            <span>Dosya Adını Değiştir</span>
+        </div>
+        <div class="popup-row">
+            <input type="text" class="popup-input" id="renameInput" placeholder="Dosya adı...">
+        </div>
+        <div class="popup-row" style="justify-content: flex-end; margin-top: 8px;">
+            <button class="popup-btn secondary" id="btnRenameCancel">İptal</button>
+            <button class="popup-btn" id="btnRenameSave">Kaydet</button>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept=".txt,.html,.js,.css,.json,.md,.csv,.py,.java,.cpp,.c,.h,.php,.xml,.sql">
 
     <div id="previewOverlay">
         <div id="previewHeader">
             <b style="font-size: 17px;">Canlı Önizleme</b>
-            <button id="btnPreviewClose" style="background: red; color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kapat</button>
+            <button class="preview-btn" id="btnPreviewClose">Kapat</button>
         </div>
-        <iframe id="previewFrame" style="flex:1; width:100%; border:none; background:#ffffff;"></iframe>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-popups"></iframe>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        const editor = document.getElementById('editor');
-        const lineNumbers = document.getElementById('lineNumbers');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        const fileInput = document.getElementById('fileInput');
-        
-        const btnMenuToggle = document.getElementById('btnMenuToggle');
-        const mainMenu = document.getElementById('mainMenu');
-        
-        const tabsList = document.getElementById('tabsList');
-        const btnAddTab = document.getElementById('btnAddTab');
-
-        const searchPopup = document.getElementById('searchPopup');
-        const searchInput = document.getElementById('searchInput');
-
-        const fontSizePopup = document.getElementById('fontSizePopup');
-        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
-
-        // ÖNİZLEME OVERLAY (YENİ BAĞLANDI)
-        const previewOverlay = document.getElementById('previewOverlay');
-        const previewFrame = document.getElementById('previewFrame');
-        
-        function openPreview() {
-            previewOverlay.style.display = 'flex';
-            previewFrame.srcdoc = editor.value;
-            mainMenu.classList.remove('active');
-        }
-        document.getElementById('btnPreviewPlay').addEventListener('click', openPreview);
-        document.getElementById('menuPreviewText').addEventListener('click', openPreview);
-        document.getElementById('btnPreviewClose').addEventListener('click', () => {
-            previewOverlay.style.display = 'none';
-            previewFrame.srcdoc = '';
-        });
-
-        // TOOLBAR FONKSİYONU
-        window.insertText = function(text) {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            editor.setRangeText(text, start, end, 'end');
-            editor.focus();
-            editor.dispatchEvent(new Event('input'));
+        // ==================== STATE MANAGEMENT ====================
+        const AppState = {
+            tabs: [],
+            activeTabId: null,
+            tabCounter: 0,
+            isProgrammaticChange: false,
+            currentFontSize: parseInt(localStorage.getItem('alpEditorFontSize')) || 16,
+            autoSaveInterval: null,
+            lastSearchIndex: 0,
+            fileHandles: new Map() // For File System Access API
         };
 
-        // YAZI BOYUTU
-        let currentFontSize = parseInt(localStorage.getItem('alpEditorFontSize')) || 16;
-        function applyFontSize(size) {
-            document.documentElement.style.setProperty('--editor-font-size', size + 'px');
-            fontSizeDisplay.textContent = size + 'px';
-            localStorage.setItem('alpEditorFontSize', size);
-        }
-        applyFontSize(currentFontSize);
+        // ==================== DOM ELEMENTS ====================
+        const elements = {
+            editor: document.getElementById('editor'),
+            lineNumbers: document.getElementById('lineNumbers'),
+            fileNameDisplay: document.getElementById('fileNameDisplay'),
+            fileInput: document.getElementById('fileInput'),
+            btnMenuToggle: document.getElementById('btnMenuToggle'),
+            mainMenu: document.getElementById('mainMenu'),
+            tabsList: document.getElementById('tabsList'),
+            btnAddTab: document.getElementById('btnAddTab'),
+            searchOverlay: document.getElementById('searchOverlay'),
+            searchPopup: document.getElementById('searchPopup'),
+            searchInput: document.getElementById('searchInput'),
+            replaceInput: document.getElementById('replaceInput'),
+            fontSizePopup: document.getElementById('fontSizePopup'),
+            fontSizeDisplay: document.getElementById('fontSizeDisplay'),
+            previewOverlay: document.getElementById('previewOverlay'),
+            previewFrame: document.getElementById('previewFrame'),
+            statusBar: document.getElementById('statusBar'),
+            cursorPos: document.getElementById('cursorPos'),
+            saveStatus: document.getElementById('saveStatus'),
+            toast: document.getElementById('toast'),
+            renamePopup: document.getElementById('renamePopup'),
+            renameInput: document.getElementById('renameInput')
+        };
 
-        document.getElementById('menuFontSize').addEventListener('click', () => {
-            fontSizePopup.classList.add('active');
-            searchPopup.classList.remove('active');
-            mainMenu.classList.remove('active');
-        });
-        document.getElementById('btnFontClose').addEventListener('click', () => fontSizePopup.classList.remove('active'));
-        document.getElementById('btnFontInc').addEventListener('click', () => { if (currentFontSize < 40) applyFontSize(++currentFontSize); });
-        document.getElementById('btnFontDec').addEventListener('click', () => { if (currentFontSize > 8) applyFontSize(--currentFontSize); });
-
-        // SEKME YÖNETİMİ (SENİN ORİJİNAL HİSTORY MANTIĞINIZ)
-        let tabs = [], activeTabId = null, tabCounter = 0, isProgrammaticChange = false;
-
-        function createTab(name = "new.txt", content = "") {
-            tabCounter++;
-            tabs.push({ id: tabCounter, name, content, history: [content], historyIndex: 0 });
-            renderTabs(); switchTab(tabCounter);
-        }
-
-        function renderTabs() {
-            tabsList.innerHTML = '';
-            tabs.forEach(tab => {
-                const tabEl = document.createElement('div');
-                tabEl.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
-                tabEl.innerHTML = `<span class="tab-name">${tab.name}</span><span class="tab-close" data-id="${tab.id}">×</span>`;
-                tabEl.querySelector('.tab-name').onclick = () => switchTab(tab.id);
-                tabEl.querySelector('.tab-close').onclick = (e) => { e.stopPropagation(); closeTab(tab.id); };
-                tabsList.appendChild(tabEl);
-            });
+        // ==================== UTILITY FUNCTIONS ====================
+        function showToast(message, duration = 2000) {
+            elements.toast.textContent = message;
+            elements.toast.classList.add('show');
+            setTimeout(() => elements.toast.classList.remove('show'), duration);
         }
 
-        function switchTab(id) {
-            if (activeTabId !== null) {
-                const currentTab = tabs.find(t => t.id === activeTabId);
-                if(currentTab) currentTab.content = editor.value;
-            }
-            activeTabId = id; const newTab = tabs.find(t => t.id === id);
-            isProgrammaticChange = true;
-            editor.value = newTab.content;
-            fileNameDisplay.textContent = newTab.name;
-            renderTabs(); updateLineNumbers();
+        function updateStatusBar() {
+            const text = elements.editor.value;
+            const pos = elements.editor.selectionStart;
+            const lines = text.substring(0, pos).split('\n');
+            const line = lines.length;
+            const col = lines[lines.length - 1].length + 1;
+            elements.cursorPos.textContent = `Ln ${line}, Col ${col}`;
         }
-
-        function closeTab(id) {
-            if (tabs.length === 1) return;
-            tabs = tabs.filter(t => t.id !== id);
-            if (activeTabId === id) switchTab(tabs[tabs.length - 1].id);
-            else renderTabs();
-        }
-        btnAddTab.addEventListener('click', () => createTab());
-
-        // SATIR NUMARALARI VE HISTORY
-        function updateLineNumbers() {
-            const lines = editor.value.split('\n').length;
-            lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => i + 1).join('<br>');
-        }
-        
-        editor.addEventListener('input', () => {
-            updateLineNumbers();
-            const active = tabs.find(t => t.id === activeTabId);
-            if (!isProgrammaticChange) {
-                if (active.historyIndex < active.history.length - 1) active.history = active.history.slice(0, active.historyIndex + 1);
-                active.history.push(editor.value);
-                active.historyIndex++;
-            }
-            isProgrammaticChange = false;
-        });
-
-        editor.addEventListener('scroll', () => { lineNumbers.scrollTop = editor.scrollTop; });
-
-        // ANA MENÜ AÇMA/KAPAMA
-        btnMenuToggle.addEventListener('click', (e) => { e.stopPropagation(); mainMenu.classList.toggle('active'); });
-        document.addEventListener('click', (e) => { if (!mainMenu.contains(e.target) && e.target !== btnMenuToggle) mainMenu.classList.remove('active'); });
-
-        // === SENİN ORİJİNAL DOSYA İŞLEMLERİNİZ (KAŞLA GÖZ ARASINDA DEĞİŞTİRMEDİM) ===
-        document.getElementById('menuOpen').addEventListener('click', () => { fileInput.click(); mainMenu.classList.remove('active'); });
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target.result; const activeTab = tabs.find(t => t.id === activeTabId);
-                activeTab.name = file.name; activeTab.content = content; activeTab.history = [content]; activeTab.historyIndex = 0;
-                isProgrammaticChange = true; editor.value = content; fileNameDisplay.textContent = file.name;
-                renderTabs(); updateLineNumbers();
-            };
-            reader.readAsText(file); fileInput.value = '';
-        });
 
         function getMimeType(filename) {
             const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
-            const mimeTypes = { 'html': 'text/html', 'js': 'text/javascript', 'css': 'text/css', 'json': 'application/json', 'md': 'text/markdown', 'csv': 'text/csv', 'txt': 'text/plain' };
-            return mimeTypes[ext] || 'application/octet-stream';
+            const mimeTypes = {
+                'html': 'text/html', 'htm': 'text/html',
+                'js': 'text/javascript', 'mjs': 'text/javascript',
+                'css': 'text/css',
+                'json': 'application/json',
+                'md': 'text/markdown',
+                'txt': 'text/plain',
+                'csv': 'text/csv',
+                'py': 'text/x-python',
+                'java': 'text/x-java-source',
+                'cpp': 'text/x-c++src',
+                'c': 'text/x-csrc',
+                'h': 'text/x-chdr',
+                'php': 'application/x-httpd-php',
+                'xml': 'application/xml',
+                'sql': 'application/sql'
+            };
+            return mimeTypes[ext] || 'text/plain';
         }
 
-        // SENİN downloadFile MANTIĞIN
-        function downloadFile(filename, content) {
-            const blob = new Blob([content], { type: getMimeType(filename) });
-            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename;
-            document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
-        }
-
-        // SENİN menuSave MANTIĞIN
-        document.getElementById('menuSave').addEventListener('click', () => {
-            const activeTab = tabs.find(t => t.id === activeTabId);
-            // SENİN adını prompt İLE DEĞİŞTİRME MANTIĞIN (DEĞİŞTİRMEDİM)
-            if (activeTab.name === "new.txt") {
-                const newName = prompt("Dosya adı girin (Örn: not.html):", activeTab.name);
-                if (newName) activeTab.name = newName;
-            }
-            downloadFile(activeTab.name, editor.value);
+        // ==================== TAB MANAGEMENT ====================
+        function createTab(name = "new.txt", content = "", fileHandle = null) {
+            AppState.tabCounter++;
+            const tabId = AppState.tabCounter;
+            
+            const tab = {
+                id: tabId,
+                name: name,
+                content: content,
+                history: [content],
+                historyIndex: 0,
+                fileHandle: fileHandle,
+                isModified: false
+            };
+            
+            AppState.tabs.push(tab);
+            if (fileHandle) AppState.fileHandles.set(tabId, fileHandle);
+            
             renderTabs();
-            mainMenu.classList.remove('active');
-        });
-
-        // SENİN menuSaveAs MANTIĞIN (DEĞİŞTİRMEDİM)
-        document.getElementById('menuSaveAs').addEventListener('click', () => {
-            const activeTab = tabs.find(t => t.id === activeTabId);
-            const newName = prompt("Farklı Kaydet adını girin (Örn: index.html):", activeTab.name);
-            if (newName && newName.trim() !== "") {
-                activeTab.name = newName.trim();
-                renderTabs();
-                fileNameDisplay.textContent = activeTab.name;
-                downloadFile(activeTab.name, editor.value);
-            }
-            mainMenu.classList.remove('active');
-        });
-
-        // UNDO / REDO (SENİN MANTIĞININIZ)
-        document.getElementById('menuUndo').addEventListener('click', () => {
-            const active = tabs.find(t => t.id === activeTabId);
-            if (active.historyIndex > 0) { active.historyIndex--; isProgrammaticChange = true; editor.value = active.history[active.historyIndex]; updateLineNumbers(); }
-            mainMenu.classList.remove('active');
-        });
-        document.getElementById('menuRedo').addEventListener('click', () => {
-            const active = tabs.find(t => t.id === activeTabId);
-            if (active.historyIndex < active.history.length - 1) { active.historyIndex++; isProgrammaticChange = true; editor.value = active.history[active.historyIndex]; updateLineNumbers(); }
-            mainMenu.classList.remove('active');
-        });
-
-        // Tema
-        document.getElementById('menuTheme').addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('alpEditorTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-            mainMenu.classList.remove('active');
-        });
-        if(localStorage.getItem('alpEditorTheme') === 'dark') document.body.classList.add('dark-theme');
-
-        // ARAMA
-        let lastSearchIndex = 0;
-        function initiateSearch() { searchPopup.classList.add('active'); fontSizePopup.classList.remove('active'); searchInput.focus(); mainMenu.classList.remove('active'); }
-        document.getElementById('menuSearchText').addEventListener('click', initiateSearch);
-        document.getElementById('btnSearchClose').addEventListener('click', () => { searchPopup.classList.remove('active'); lastSearchIndex = 0; });
-        function performSearch(forward) {
-            const text = editor.value.toLowerCase(), word = searchInput.value.toLowerCase();
-            if (!word) return;
-            let foundIndex;
-            if (forward) { foundIndex = text.indexOf(word, lastSearchIndex); if (foundIndex === -1) foundIndex = text.indexOf(word); } 
-            else { let searchBefore = lastSearchIndex - word.length - 1; if (searchBefore < 0) searchBefore = text.length; foundIndex = text.lastIndexOf(word, searchBefore); if (foundIndex === -1) foundIndex = text.lastIndexOf(word); }
-            if (foundIndex !== -1) { editor.focus(); editor.setSelectionRange(foundIndex, foundIndex + word.length); lastSearchIndex = foundIndex + word.length; } 
-            else { alert("Kelime bulunamadı."); }
+            switchTab(tabId);
+            saveSession();
+            return tabId;
         }
+
+        function renderTabs() {
+            elements.tabsList.innerHTML = '';
+            AppState.tabs.forEach(tab => {
+                const tabEl = document.createElement('div');
+                tabEl.className = `tab ${tab.id === AppState.activeTabId ? 'active' : ''}`;
+                const displayName = tab.name + (tab.isModified ? ' •' : '');
+                tabEl.innerHTML = `
+                    <span class="tab-name" title="${tab.name}">${displayName}</span>
+                    <span class="tab-close" data-id="${tab.id}" title="Kapat">×</span>
+                `;
+                
+                tabEl.querySelector('.tab-name').onclick = () => switchTab(tab.id);
+                tabEl.querySelector('.tab-close').onclick = (e) => {
+                    e.stopPropagation();
+                    closeTab(tab.id);
+                };
+                
+                elements.tabsList.appendChild(tabEl);
+            });
+        }
+
+        function switchTab(tabId) {
+            if (AppState.activeTabId !== null) {
+                const currentTab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+                if (currentTab) {
+                    currentTab.content = elements.editor.value;
+                }
+            }
+            
+            AppState.activeTabId = tabId;
+            const newTab = AppState.tabs.find(t => t.id === tabId);
+            if (!newTab) return;
+            
+            AppState.isProgrammaticChange = true;
+            elements.editor.value = newTab.content;
+            elements.fileNameDisplay.textContent = newTab.name;
+            
+            updateLineNumbers();
+            renderTabs();
+            updateStatusBar();
+            saveSession();
+        }
+
+        function closeTab(tabId) {
+            if (AppState.tabs.length === 1) {
+                showToast('En az bir sekme açık kalmalı');
+                return;
+            }
+            
+            const tab = AppState.tabs.find(t => t.id === tabId);
+            if (tab && tab.isModified) {
+                if (!confirm(`${tab.name} dosyasında kaydedilmemiş değişiklikler var. Yine de kapatılsın mı?`)) {
+                    return;
+                }
+            }
+            
+            AppState.tabs = AppState.tabs.filter(t => t.id !== tabId);
+            AppState.fileHandles.delete(tabId);
+            
+            if (AppState.activeTabId === tabId) {
+                switchTab(AppState.tabs[AppState.tabs.length - 1].id);
+            } else {
+                renderTabs();
+            }
+            saveSession();
+        }
+
+        function updateTabModifiedState(modified = true) {
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (tab && tab.isModified !== modified) {
+                tab.isModified = modified;
+                renderTabs();
+            }
+        }
+
+        // ==================== EDITOR FUNCTIONS ====================
+        function updateLineNumbers() {
+            const lines = elements.editor.value.split('\n').length;
+            elements.lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => i + 1).join('<br>');
+        }
+
+        function insertChar(text) {
+            const editor = elements.editor;
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            
+            // Smart indentation for TAB
+            if (text === '\t') {
+                handleIndentation();
+                return;
+            }
+            
+            editor.setRangeText(text, start, end, 'end');
+            editor.focus();
+            triggerInput();
+        }
+
+        function handleIndentation() {
+            const editor = elements.editor;
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const value = editor.value;
+            
+            // Find line start
+            let lineStart = value.lastIndexOf('\n', start - 1) + 1;
+            let lineEnd = value.indexOf('\n', end);
+            if (lineEnd === -1) lineEnd = value.length;
+            
+            const selectedText = value.substring(lineStart, lineEnd);
+            const lines = selectedText.split('\n');
+            
+            // Check if we have multi-line selection
+            if (lines.length > 1) {
+                // Indent/Unindent all lines
+                const isUnindent = lines.every(line => line.startsWith('    ') || line.startsWith('\t') || line === '');
+                const newLines = lines.map(line => {
+                    if (isUnindent) {
+                        if (line.startsWith('    ')) return line.substring(4);
+                        if (line.startsWith('\t')) return line.substring(1);
+                        return line;
+                    } else {
+                        return '    ' + line;
+                    }
+                });
+                
+                const newText = newLines.join('\n');
+                editor.setRangeText(newText, lineStart, lineEnd, 'select');
+            } else {
+                // Single line - insert spaces
+                editor.setRangeText('    ', start, end, 'end');
+            }
+            
+            editor.focus();
+            triggerInput();
+        }
+
+        function triggerInput() {
+            elements.editor.dispatchEvent(new Event('input'));
+        }
+
+        // ==================== HISTORY (UNDO/REDO) ====================
+        function saveHistory() {
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (!tab || AppState.isProgrammaticChange) {
+                AppState.isProgrammaticChange = false;
+                return;
+            }
+            
+            // Remove redo history if we make new changes
+            if (tab.historyIndex < tab.history.length - 1) {
+                tab.history = tab.history.slice(0, tab.historyIndex + 1);
+            }
+            
+            tab.history.push(elements.editor.value);
+            tab.historyIndex++;
+            
+            // Limit history size
+            if (tab.history.length > 50) {
+                tab.history.shift();
+                tab.historyIndex--;
+            }
+            
+            updateTabModifiedState(true);
+            updateStatusBar();
+        }
+
+        function undo() {
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (!tab || tab.historyIndex <= 0) return;
+            
+            tab.historyIndex--;
+            AppState.isProgrammaticChange = true;
+            elements.editor.value = tab.history[tab.historyIndex];
+            updateLineNumbers();
+            updateStatusBar();
+            updateTabModifiedState(tab.history[tab.historyIndex] !== tab.history[0]);
+        }
+
+        function redo() {
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (!tab || tab.historyIndex >= tab.history.length - 1) return;
+            
+            tab.historyIndex++;
+            AppState.isProgrammaticChange = true;
+            elements.editor.value = tab.history[tab.historyIndex];
+            updateLineNumbers();
+            updateStatusBar();
+            updateTabModifiedState(tab.history[tab.historyIndex] !== tab.history[0]);
+        }
+
+        // ==================== FILE OPERATIONS ====================
+        async function openFile() {
+            // Try File System Access API first (Chrome/Android)
+            if ('showOpenFilePicker' in window) {
+                try {
+                    const [fileHandle] = await window.showOpenFilePicker({
+                        types: [{
+                            description: 'Text Files',
+                            accept: {'text/*': ['.txt', '.html', '.js', '.css', '.json', '.md', '.csv', '.py', '.java', '.cpp', '.c', '.php']}
+                        }]
+                    });
+                    
+                    const file = await fileHandle.getFile();
+                    const content = await file.text();
+                    createTab(file.name, content, fileHandle);
+                    showToast(`${file.name} açıldı`);
+                    return;
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('File System Access API error:', err);
+                        // Fall back to traditional input
+                    }
+                }
+            }
+            
+            // Fallback to traditional file input
+            elements.fileInput.click();
+        }
+
+        elements.fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const content = await file.text();
+                const existingTab = AppState.tabs.find(t => t.name === file.name);
+                
+                if (existingTab) {
+                    existingTab.content = content;
+                    existingTab.history = [content];
+                    existingTab.historyIndex = 0;
+                    switchTab(existingTab.id);
+                } else {
+                    createTab(file.name, content);
+                }
+                
+                showToast(`${file.name} açıldı`);
+            } catch (err) {
+                showToast('Dosya açılırken hata oluştu');
+                console.error(err);
+            }
+            
+            event.target.value = '';
+        });
+
+        async function saveFile(isSaveAs = false) {
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (!tab) return;
+            
+            const content = elements.editor.value;
+            
+            // Try File System Access API if we have a handle and not SaveAs
+            if (!isSaveAs && tab.fileHandle && 'showSaveFilePicker' in window) {
+                try {
+                    const writable = await tab.fileHandle.createWritable();
+                    await writable.write(content);
+                    await writable.close();
+                    
+                    tab.isModified = false;
+                    renderTabs();
+                    showToast('Kaydedildi');
+                    return;
+                } catch (err) {
+                    console.error('Save error:', err);
+                }
+            }
+            
+            // Traditional download method
+            let filename = tab.name;
+            if (isSaveAs || tab.name === 'new.txt') {
+                const newName = prompt('Dosya adı:', tab.name);
+                if (!newName) return;
+                filename = newName;
+                tab.name = newName;
+                elements.fileNameDisplay.textContent = newName;
+                renderTabs();
+            }
+            
+            const blob = new Blob([content], { type: getMimeType(filename) });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+            
+            tab.isModified = false;
+            renderTabs();
+            showToast(`${filename} indirildi`);
+        }
+
+        // ==================== SEARCH & REPLACE ====================
+        function openSearch() {
+            elements.searchPopup.classList.add('active');
+            elements.searchOverlay.classList.add('active');
+            elements.searchInput.focus();
+            elements.mainMenu.classList.remove('active');
+            AppState.lastSearchIndex = 0;
+        }
+
+        function closeSearch() {
+            elements.searchPopup.classList.remove('active');
+            elements.searchOverlay.classList.remove('active');
+            elements.searchInput.value = '';
+            elements.replaceInput.value = '';
+            AppState.lastSearchIndex = 0;
+        }
+
+        function performSearch(forward = true) {
+            const text = elements.editor.value.toLowerCase();
+            const word = elements.searchInput.value.toLowerCase();
+            if (!word) return;
+            
+            let foundIndex;
+            if (forward) {
+                foundIndex = text.indexOf(word, AppState.lastSearchIndex);
+                if (foundIndex === -1) foundIndex = text.indexOf(word);
+            } else {
+                let searchBefore = AppState.lastSearchIndex - word.length - 1;
+                if (searchBefore < 0) searchBefore = text.length;
+                foundIndex = text.lastIndexOf(word, searchBefore);
+                if (foundIndex === -1) foundIndex = text.lastIndexOf(word);
+            }
+            
+            if (foundIndex !== -1) {
+                elements.editor.focus();
+                elements.editor.setSelectionRange(foundIndex, foundIndex + word.length);
+                AppState.lastSearchIndex = foundIndex + word.length;
+                updateStatusBar();
+            } else {
+                showToast('Bulunamadı');
+            }
+        }
+
+        function replaceAll() {
+            const searchText = elements.searchInput.value;
+            const replaceText = elements.replaceInput.value;
+            
+            if (!searchText) return;
+            
+            const editor = elements.editor;
+            const originalValue = editor.value;
+            const newValue = originalValue.split(searchText).join(replaceText);
+            
+            if (originalValue !== newValue) {
+                editor.value = newValue;
+                triggerInput();
+                const count = (originalValue.split(searchText).length - 1);
+                showToast(`${count} değişiklik yapıldı`);
+            } else {
+                showToast('Değiştirilecek metin bulunamadı');
+            }
+        }
+
+        // ==================== CLIPBOARD OPERATIONS ====================
+        async function handleClipboard(action) {
+            const editor = elements.editor;
+            
+            try {
+                switch(action) {
+                    case 'selectAll':
+                        editor.select();
+                        break;
+                    case 'copy':
+                        const selectedText = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+                        if (selectedText) {
+                            await navigator.clipboard.writeText(selectedText);
+                            showToast('Kopyalandı');
+                        }
+                        break;
+                    case 'cut':
+                        const cutText = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+                        if (cutText) {
+                            await navigator.clipboard.writeText(cutText);
+                            editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end');
+                            triggerInput();
+                            showToast('Kesildi');
+                        }
+                        break;
+                    case 'paste':
+                        try {
+                            const text = await navigator.clipboard.readText();
+                            editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
+                            triggerInput();
+                        } catch {
+                            showToast('Pano erişilemedi');
+                        }
+                        break;
+                    case 'delete':
+                        if (editor.selectionStart !== editor.selectionEnd) {
+                            editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end');
+                            triggerInput();
+                        }
+                        break;
+                }
+            } catch (err) {
+                console.error('Clipboard error:', err);
+            }
+            elements.mainMenu.classList.remove('active');
+        }
+
+        // ==================== PREVIEW ====================
+        function openPreview() {
+            const content = elements.editor.value;
+            elements.previewOverlay.classList.add('active');
+            
+            // For HTML files, show rendered content
+            // For others, show as formatted text
+            if (elements.fileNameDisplay.textContent.endsWith('.html') || 
+                elements.fileNameDisplay.textContent.endsWith('.htm')) {
+                elements.previewFrame.srcdoc = content;
+            } else {
+                const escaped = content
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+                elements.previewFrame.srcdoc = `
+                    <pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${escaped}</pre>
+                `;
+            }
+            elements.mainMenu.classList.remove('active');
+        }
+
+        function closePreview() {
+            elements.previewOverlay.classList.remove('active');
+            elements.previewFrame.srcdoc = '';
+        }
+
+        // ==================== RENAME FILE ====================
+        function openRename() {
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (!tab) return;
+            
+            elements.renameInput.value = tab.name;
+            elements.renamePopup.classList.add('active');
+            elements.renameInput.focus();
+            elements.renameInput.select();
+        }
+
+        function closeRename() {
+            elements.renamePopup.classList.remove('active');
+        }
+
+        function saveRename() {
+            const newName = elements.renameInput.value.trim();
+            if (!newName) return;
+            
+            const tab = AppState.tabs.find(t => t.id === AppState.activeTabId);
+            if (tab) {
+                tab.name = newName;
+                elements.fileNameDisplay.textContent = newName;
+                renderTabs();
+                saveSession();
+                showToast('Dosya yeniden adlandırıldı');
+            }
+            closeRename();
+        }
+
+        // ==================== FONT SIZE ====================
+        function applyFontSize(size) {
+            document.documentElement.style.setProperty('--editor-font-size', size + 'px');
+            elements.fontSizeDisplay.textContent = size + 'px';
+            localStorage.setItem('alpEditorFontSize', size);
+            AppState.currentFontSize = size;
+        }
+
+        function changeFontSize(delta) {
+            const newSize = AppState.currentFontSize + delta;
+            if (newSize >= 8 && newSize <= 32) {
+                applyFontSize(newSize);
+            }
+        }
+
+        // ==================== THEME ====================
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('alpEditorTheme', isDark ? 'dark' : 'light');
+            showToast(isDark ? 'Karanlık tema' : 'Açık tema');
+        }
+
+        // ==================== SESSION MANAGEMENT ====================
+        function saveSession() {
+            const session = {
+                tabs: AppState.tabs.map(t => ({
+                    id: t.id,
+                    name: t.name,
+                    content: t.content,
+                    history: [t.content], // Save only current state to save space
+                    historyIndex: 0
+                })),
+                activeTabId: AppState.activeTabId,
+                counter: AppState.tabCounter
+            };
+            localStorage.setItem('alpEditorSession', JSON.stringify(session));
+        }
+
+        function restoreSession() {
+            const saved = localStorage.getItem('alpEditorSession');
+            if (!saved) {
+                createTab();
+                return;
+            }
+            
+            try {
+                const session = JSON.parse(saved);
+                if (session.tabs && session.tabs.length > 0) {
+                    AppState.tabCounter = session.counter || 0;
+                    session.tabs.forEach(t => {
+                        createTab(t.name, t.content);
+                    });
+                    if (session.activeTabId) {
+                        const tab = AppState.tabs.find(t => t.id === session.activeTabId);
+                        if (tab) switchTab(tab.id);
+                    }
+                } else {
+                    createTab();
+                }
+            } catch (e) {
+                console.error('Session restore failed:', e);
+                createTab();
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        
+        // Editor events
+        elements.editor.addEventListener('input', () => {
+            updateLineNumbers();
+            saveHistory();
+            updateStatusBar();
+            
+            // Auto-save indicator
+            elements.saveStatus.textContent = 'Değiştirildi';
+            elements.statusBar.classList.add('visible');
+            clearTimeout(window.saveIndicatorTimeout);
+            window.saveIndicatorTimeout = setTimeout(() => {
+                elements.saveStatus.textContent = 'Kaydedildi';
+                saveSession();
+            }, 1000);
+        });
+
+        elements.editor.addEventListener('scroll', () => {
+            elements.lineNumbers.scrollTop = elements.editor.scrollTop;
+        });
+
+        elements.editor.addEventListener('click', updateStatusBar);
+        elements.editor.addEventListener('keyup', updateStatusBar);
+
+        // Keyboard shortcuts
+        elements.editor.addEventListener('keydown', (e) => {
+            // Tab key handling
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                handleIndentation();
+                return;
+            }
+            
+            // Keyboard shortcuts
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key.toLowerCase()) {
+                    case 's':
+                        e.preventDefault();
+                        if (e.shiftKey) saveFile(true);
+                        else saveFile(false);
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        openFile();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        if (e.shiftKey) redo();
+                        else undo();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        redo();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        openSearch();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        openPreview();
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        createTab();
+                        break;
+                }
+            }
+        });
+
+        // Menu toggle
+        elements.btnMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            elements.mainMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!elements.mainMenu.contains(e.target) && e.target !== elements.btnMenuToggle) {
+                elements.mainMenu.classList.remove('active');
+            }
+            if (e.target === elements.searchOverlay) {
+                closeSearch();
+            }
+        });
+
+        // File menu
+        document.getElementById('menuOpen').addEventListener('click', openFile);
+        document.getElementById('menuSave').addEventListener('click', () => saveFile(false));
+        document.getElementById('menuSaveAs').addEventListener('click', () => saveFile(true));
+        document.getElementById('menuUndo').addEventListener('click', undo);
+        document.getElementById('menuRedo').addEventListener('click', redo);
+        document.getElementById('menuSearchText').addEventListener('click', openSearch);
+        document.getElementById('menuTheme').addEventListener('click', toggleTheme);
+        document.getElementById('menuSelectAllText').addEventListener('click', () => handleClipboard('selectAll'));
+        document.getElementById('menuCopyText').addEventListener('click', () => handleClipboard('copy'));
+        document.getElementById('menuCutText').addEventListener('click', () => handleClipboard('cut'));
+        document.getElementById('menuPasteText').addEventListener('click', () => handleClipboard('paste'));
+        document.getElementById('menuDeleteText').addEventListener('click', () => handleClipboard('delete'));
+
+        // Font size
+        document.getElementById('menuFontSize').addEventListener('click', () => {
+            elements.fontSizePopup.classList.add('active');
+            elements.mainMenu.classList.remove('active');
+        });
+        document.getElementById('btnFontClose').addEventListener('click', () => {
+            elements.fontSizePopup.classList.remove('active');
+        });
+        document.getElementById('btnFontInc').addEventListener('click', () => changeFontSize(1));
+        document.getElementById('btnFontDec').addEventListener('click', () => changeFontSize(-1));
+
+        // Search
+        document.getElementById('btnSearchClose').addEventListener('click', closeSearch);
         document.getElementById('btnSearchNext').addEventListener('click', () => performSearch(true));
         document.getElementById('btnSearchPrev').addEventListener('click', () => performSearch(false));
+        document.getElementById('btnReplaceAll').addEventListener('click', replaceAll);
+        
+        elements.searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch(true);
+        });
 
-        // 3 NOKTA MENÜSÜNDEKİ KES/KOPYALA (SENİN ONAYLADIĞIN KODDUR)
-        function handleAction(actionType) {
-            editor.focus();
-            if (actionType === 'selectAll') editor.select();
-            else if (actionType === 'copy') { const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd); if(sel) navigator.clipboard.writeText(sel); }
-            else if (actionType === 'cut') {
-                const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-                if (sel) { navigator.clipboard.writeText(sel).then(() => { editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input')); }); }
-            }
-            else if (actionType === 'paste') {
-                navigator.clipboard.readText().then(text => { editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input')); }).catch(() => alert("Pano izni yok."));
-            }
-            else if (actionType === 'delete') {
-                if (editor.selectionStart !== editor.selectionEnd) { editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input')); }
-            }
-            mainMenu.classList.remove('active');
-        }
-        document.getElementById('menuSelectAllText').addEventListener('click', () => handleAction('selectAll'));
-        document.getElementById('menuCopyText').addEventListener('click', () => handleAction('copy'));
-        document.getElementById('menuCutText').addEventListener('click', () => handleAction('cut'));
-        document.getElementById('menuPasteText').addEventListener('click', () => handleAction('paste'));
-        document.getElementById('menuDeleteText').addEventListener('click', () => handleAction('delete'));
+        // Preview
+        elements.btnPreviewPlay.addEventListener('click', openPreview);
+        document.getElementById('menuPreviewText').addEventListener('click', openPreview);
+        document.getElementById('btnPreviewClose').addEventListener('click', closePreview);
 
-        createTab();
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.log(e)); }); }
+        // Rename
+        elements.fileNameDisplay.addEventListener('click', openRename);
+        document.getElementById('btnRenameCancel').addEventListener('click', closeRename);
+        document.getElementById('btnRenameSave').addEventListener('click', saveRename);
+        elements.renameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveRename();
+        });
+
+        // Tabs
+        elements.btnAddTab.addEventListener('click', () => createTab());
+
+        // Prevent zoom on double tap for iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Initialize
+        window.addEventListener('load', () => {
+            restoreSession();
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('alpEditorTheme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else if (savedTheme === 'light') {
+                document.body.classList.remove('dark-theme');
+            }
+            
+            // Apply saved font size
+            applyFontSize(AppState.currentFontSize);
+            
+            // Register service worker with fallback
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(e => {
+                    console.log('Service Worker registration skipped (sw.js not found)');
+                });
+            }
+            
+            // Warn before unload if unsaved changes
+            window.addEventListener('beforeunload', (e) => {
+                const hasUnsaved = AppState.tabs.some(t => t.isModified);
+                if (hasUnsaved) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+        });
+
+        // Visibility change - save session when switching apps
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                saveSession();
+            }
+        });
     </script>
 </body>
 </html>
