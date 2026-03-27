@@ -1,198 +1,325 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>AlpEditör</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <style>
-        :root {
-            --ios-bg: #f2f2f7; --ios-header: #f8f8f8; --ios-blue: #007AFF; --ios-border: #c6c6c8;
-            --ios-text: #000000; --ios-menu-bg: rgba(250, 250, 250, 0.95); --ios-tab-bg: #e5e5ea;
-            --ios-tab-active: #ffffff; --ios-line-num: #8e8e93; --ios-line-bg: #f8f8f8;
-            --editor-font-size: 16px; 
-        }
-        body.dark-theme {
-            --ios-bg: #000000; --ios-header: #1c1c1e; --ios-blue: #0a84ff; --ios-border: #38383a;
-            --ios-text: #ffffff; --ios-menu-bg: rgba(40, 40, 40, 0.95); --ios-tab-bg: #2c2c2e;
-            --ios-tab-active: #000000; --ios-line-num: #636366;
-        }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; background-color: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s; }
-        
-        header { background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; padding-top: max(15px, env(safe-area-inset-top)); position: relative; z-index: 100; }
-        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
-        .btn-icon { color: var(--ios-blue); background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AlpEditör Ultimate</title>
 
-        .dropdown-menu, .popup-window, .ios-context-menu { position: absolute; background-color: var(--ios-menu-bg); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); display: none; flex-direction: column; overflow: hidden; border: 1px solid var(--ios-border); z-index: 500; }
-        .active { display: flex !important; }
-        
-        .dropdown-menu button, .ios-context-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; min-width: 170px; cursor: pointer; }
-        .dropdown-menu button:last-child, .ios-context-menu button:last-child { border-bottom: none; }
+<style>
+:root{
+--bg:#f2f2f7; --header:#f8f8f8; --blue:#007AFF; --border:#c6c6c8;
+--text:#000; --menu:rgba(255,255,255,0.9);
+--tab:#e5e5ea; --tabActive:#fff; --line:#8e8e93;
+--fs:16px;
+}
+body.dark{
+--bg:#000; --header:#1c1c1e; --blue:#0a84ff; --border:#38383a;
+--text:#fff; --menu:rgba(44,44,46,.95);
+--tab:#2c2c2e; --tabActive:#000; --line:#636366;
+}
 
-        .tabs-container { display: flex; background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
-        .tab { padding: 10px 15px; font-size: 14px; background-color: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .tab.active { background-color: var(--ios-tab-active); font-weight: 600; }
+body{
+margin:0;height:100vh;display:flex;flex-direction:column;
+background:var(--bg);color:var(--text);
+font-family:-apple-system;
+}
 
-        .editor-wrapper { display: flex; flex: 1; overflow: hidden; background-color: var(--ios-tab-active); }
-        .line-numbers { width: 40px; padding: 15px 5px; font-family: monospace; font-size: var(--editor-font-size); line-height: 1.5; color: var(--ios-line-num); text-align: right; background-color: var(--ios-header); border-right: 1px solid var(--ios-border); overflow: hidden; user-select: none; }
-        textarea { flex: 1; border: none; padding: 15px; font-size: var(--editor-font-size); line-height: 1.5; font-family: monospace; background-color: transparent; color: var(--ios-text); outline: none; white-space: pre; resize: none; }
+/* HEADER */
+header{
+display:flex;justify-content:space-between;align-items:center;
+padding:10px 15px;background:var(--header);
+border-bottom:1px solid var(--border);
+}
+.file{font-weight:600;overflow:hidden}
+.btn{background:none;border:none;font-size:22px;color:var(--blue)}
 
-        .toolbar { display: flex; background: var(--ios-header); border-top: 1px solid var(--ios-border); overflow-x: auto; padding: 8px; gap: 6px; }
-        .toolbar button { background: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 8px; padding: 10px; min-width: 44px; font-family: monospace; }
+/* MENU */
+.menu{
+position:absolute;top:60px;right:10px;
+background:var(--menu);
+backdrop-filter:blur(20px);
+border:1px solid var(--border);
+border-radius:12px;
+display:none;flex-direction:column;
+}
+.menu button{
+border:none;background:none;
+padding:12px 18px;text-align:left;color:var(--blue)
+}
+.menu.active{display:flex}
 
-        #previewOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; flex-direction: column; }
-        .ios-context-menu { flex-direction: row; width: auto; position: absolute; }
-        .ios-context-menu .divider { width: 1px; background-color: var(--ios-border); margin: 5px 0; }
-    </style>
+/* TABS */
+.tabs{display:flex;background:var(--header);overflow:auto}
+.tab{
+padding:8px 12px;background:var(--tab);
+border-right:1px solid var(--border);
+cursor:pointer
+}
+.tab.active{background:var(--tabActive);font-weight:bold}
+
+/* EDITOR */
+.wrap{flex:1;display:flex}
+.lines{
+width:45px;padding:10px;
+background:var(--header);
+color:var(--line);
+font-family:monospace;
+text-align:right
+}
+textarea{
+flex:1;border:none;outline:none;
+padding:10px;font-family:monospace;
+font-size:var(--fs);
+background:transparent;color:var(--text)
+}
+
+/* TOOLBAR */
+.bar{display:flex;gap:5px;padding:5px;background:var(--header)}
+.bar button{padding:8px}
+
+/* POPUP */
+.popup{
+position:fixed;top:50%;left:50%;
+transform:translate(-50%,-50%);
+background:var(--menu);
+padding:20px;border-radius:12px;
+display:none;flex-direction:column;gap:10px
+}
+.popup.active{display:flex}
+
+/* CONTEXT */
+.ctx{
+position:fixed;
+background:var(--menu);
+display:none;gap:5px;
+padding:5px;border-radius:10px
+}
+.ctx.active{display:flex}
+
+/* PREVIEW */
+#preview{
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:#fff;display:none;flex-direction:column
+}
+</style>
 </head>
-<body class="dark-theme">
+
+<body class="dark">
+
 <header>
-    <div class="file-name" id="fileNameDisplay">İsimsiz.txt</div>
-    <div style="display:flex; gap:12px;">
-        <button class="btn-icon" id="btnRun">▶️</button>
-        <button class="btn-icon" id="btnMenuToggle">•••</button>
-    </div>
-    <div class="dropdown-menu" id="mainMenu">
-        <button id="menuOpen">Aç</button>
-        <button id="menuSave">Kaydet</button>
-        <button id="menuSaveAs">Farklı Kaydet</button>
-        <button id="menuUndo">Geri Al</button>
-        <button id="menuRedo">İleri Al</button>
-        <button id="menuFontSize">Yazı Boyutu</button>
-        <button id="menuTheme">Tema Değiştir</button>
-    </div>
+<div class="file" id="file">İsimsiz.html</div>
+<div>
+<button class="btn" id="run">▶️</button>
+<button class="btn" id="menuBtn">•••</button>
+</div>
+
+<div class="menu" id="menu">
+<button onclick="openFile()">Aç</button>
+<button onclick="save(false)">Kaydet</button>
+<button onclick="save(true)">Farklı Kaydet</button>
+<button onclick="undo()">Geri Al</button>
+<button onclick="redo()">İleri Al</button>
+<button onclick="searchBox()">Ara</button>
+<button onclick="fontBox()">Yazı Boyutu</button>
+<button onclick="toggleTheme()">Tema</button>
+</div>
 </header>
-<div class="tabs-container"><div id="tabsList" style="display:flex;"></div><button id="btnAddTab" style="padding:10px 15px; color:var(--ios-blue); border:none; background:none; font-size:20px;">+</button></div>
-<div class="editor-wrapper"><div class="line-numbers" id="lineNumbers">1</div><textarea id="editor" spellcheck="false" autocomplete="off" wrap="off"></textarea></div>
-<div class="toolbar">
-    <button onclick="addTxt('\t')">TAB</button><button onclick="addTxt('<')">&lt;</button><button onclick="addTxt('>')">&gt;</button><button onclick="addTxt('/')">/</button>
-    <button onclick="addTxt('{')">{</button><button onclick="addTxt('}')">}</button><button onclick="addTxt(';')">;</button><button onclick="addTxt('=')">=</button>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="wrap">
+<div class="lines" id="lines">1</div>
+<textarea id="ed"></textarea>
 </div>
 
-<div class="popup-window" id="searchPopup">
-    <input type="text" id="searchInput" placeholder="Kelime ara..." style="padding:8px; border-radius:6px; border:1px solid var(--ios-border); background:var(--ios-bg); color:var(--ios-text);">
-    <button id="btnSearchNext">Bul</button><button id="btnSearchClose" style="color:red">Kapat</button>
+<div class="bar">
+<button onclick="ins('<')">&lt;</button>
+<button onclick="ins('>')">&gt;</button>
+<button onclick="ins('/')">/</button>
+<button onclick="ins('{}')">{}</button>
 </div>
 
-<div class="popup-window" id="fontSizePopup" style="top:50%; left:50%; transform:translate(-50%, -50%); padding:20px;">
-    <div style="display:flex; gap:15px; align-items:center;"><button id="btnFontDec">-</button><span id="fontSizeDisplay">16px</span><button id="btnFontInc">+</button></div>
-    <button id="btnFontClose" style="color:red; margin-top:10px">Kapat</button>
+<div class="ctx" id="ctx">
+<button onclick="act('copy')">Kopya</button>
+<button onclick="act('paste')">Yapıştır</button>
+<button onclick="act('cut')">Kes</button>
 </div>
 
-<div id="iosMenu" class="ios-context-menu">
-    <button id="ctxSearch">Ara</button><div class="divider"></div>
-    <button id="ctxSelectAll">Seç</button><div class="divider"></div>
-    <button id="ctxCut">Kes</button><div class="divider"></div>
-    <button id="ctxCopy">Kopya</button><div class="divider"></div>
-    <button id="ctxPaste">Yapıştır</button><div class="divider"></div>
-    <button id="ctxDelete" style="color:red">Sil</button>
+<div class="popup" id="search">
+<input id="sTxt" placeholder="Ara">
+<button onclick="find()">Bul</button>
+<button onclick="closePop()">Kapat</button>
 </div>
 
-<div id="previewOverlay">
-    <div style="background:#f8f8f8; padding:12px; display:flex; justify-content:space-between; border-bottom:1px solid #ddd; align-items:center;"><b style="color:black">Önizleme</b><button onclick="document.getElementById('previewOverlay').style.display='none'" style="background:red; color:white; border:none; padding:8px 16px; border-radius:8px;">Kapat</button></div>
-    <iframe id="previewFrame" style="flex:1; width:100%; border:none;"></iframe>
+<div class="popup" id="font">
+<button onclick="setFS(fs-1)">-</button>
+<span id="fsTxt">16px</span>
+<button onclick="setFS(fs+1)">+</button>
+<button onclick="closePop()">Kapat</button>
 </div>
 
-<input type="file" id="fileInput" style="display:none;" accept=".html,.txt,.css,.js,.json">
+<div id="preview">
+<button onclick="preview.style.display='none'">Kapat</button>
+<iframe id="frame" style="flex:1"></iframe>
+</div>
+
+<input type="file" id="f" hidden>
 
 <script>
-    const editor = document.getElementById('editor'), lineNumbers = document.getElementById('lineNumbers'), fileNameDisplay = document.getElementById('fileNameDisplay'), fileInput = document.getElementById('fileInput'), mainMenu = document.getElementById('mainMenu'), tabsList = document.getElementById('tabsList'), iosMenu = document.getElementById('iosMenu');
-    let tabs = [], activeTabId = null, tabCounter = 0, isProg = false, lastSearchIdx = 0;
+let ed=ed,lines=lines,file=file;
+let tabs=[],id=0,cur=null,fs=16,last=0;
 
-    // --- 1. GELİŞMİŞ MIME SİSTEMİ (KORUNDU) ---
-    const getMime = (n) => {
-        const ext = n.slice((n.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
-        const m = {'html':'text/html','js':'text/javascript','css':'text/css','json':'application/json','txt':'text/plain','md':'text/markdown','csv':'text/csv'};
-        return m[ext] || 'application/octet-stream';
-    };
+/* MIME */
+const mime=n=>{
+let e=n.split('.').pop();
+return {html:'text/html',js:'text/javascript',css:'text/css'}[e]||'text/plain';
+}
 
-    const updateLines = () => { const l = editor.value.split('\n').length; lineNumbers.innerHTML = Array.from({length:l}, (_,i)=>i+1).join('<br>'); };
+/* TABS */
+function addTab(n="İsimsiz.html",c=""){
+id++;tabs.push({id,name:n,content:c,h:[c],i:0});
+switchTab(id);
+}
+function switchTab(i){
+if(cur) tabs.find(t=>t.id==cur).content=ed.value;
+cur=i;
+let t=tabs.find(t=>t.id==i);
+ed.value=t.content;file.textContent=t.name;
+render();
+update();
+}
+function render(){
+tabs.innerHTML='';
+tabs.forEach(t=>{
+let d=document.createElement('div');
+d.className='tab'+(t.id==cur?' active':'');
+d.innerHTML=t.name;
+d.onclick=()=>switchTab(t.id);
+tabs.appendChild(d);
+});
+}
 
-    // --- 2. GÜVENLİ DOSYA KAYDETME ---
-    const saveFile = (asNew) => {
-        const a = tabs.find(t=>t.id===activeTabId); let n = a.name;
-        if(asNew || n === "İsimsiz.txt") { const res = prompt("Dosya adı:", n); if(!res) return; n = res; a.name = n; renderTabs(); fileNameDisplay.textContent = n; }
-        const b = new Blob([editor.value], {type: getMime(n)});
-        const url = URL.createObjectURL(b); const link = document.createElement("a"); link.href = url; link.download = n; link.click(); URL.revokeObjectURL(url);
-    };
+/* EDIT */
+ed.oninput=()=>{
+update();
+let t=tabs.find(t=>t.id==cur);
+t.h.push(ed.value);t.i++;
+}
 
-    // --- 3. SEKME VE UNDO/REDO YÖNETİMİ ---
-    const addTab = (n="İsimsiz.txt", c="") => { tabCounter++; tabs.push({id:tabCounter, name:n, content:c, history:[c], historyIndex:0}); switchTab(tabCounter); };
-    const switchTab = (id) => { if(activeTabId) tabs.find(t=>t.id===activeTabId).content = editor.value; activeTabId = id; const a = tabs.find(t=>t.id===id); isProg = true; editor.value = a.content; fileNameDisplay.textContent = a.name; renderTabs(); updateLines(); };
-    const renderTabs = () => { tabsList.innerHTML = ''; tabs.forEach(t => { const el = document.createElement('div'); el.className = `tab ${t.id===activeTabId?'active':''}`; el.innerHTML = `<span>${t.name}</span><span onclick="event.stopPropagation();closeTab(${t.id})">×</span>`; el.onclick = () => switchTab(t.id); tabsList.appendChild(el); }); };
-    const closeTab = (id) => { if(tabs.length===1) return; tabs = tabs.filter(t=>t.id!==id); switchTab(tabs[0].id); };
+/* LINES */
+function update(){
+let l=ed.value.split('\n').length;
+lines.innerHTML=Array.from({length:l},(_,i)=>i+1).join('<br>');
+}
 
-    const addTxt = (t) => { editor.setRangeText(t, editor.selectionStart, editor.selectionEnd, 'end'); editor.focus(); updateLines(); };
+/* INSERT */
+function ins(t){
+ed.setRangeText(t,ed.selectionStart,ed.selectionEnd,'end');
+}
 
-    // --- 4. CLIPBOARD API (ASYNC PASTE) ---
-    async function handleAction(act) {
-        const s = editor.selectionStart, e = editor.selectionEnd;
-        if(act==='copy') { if(s!==e) await navigator.clipboard.writeText(editor.value.substring(s,e)); }
-        else if(act==='cut') { if(s!==e) { await navigator.clipboard.writeText(editor.value.substring(s,e)); editor.setRangeText('', s, e, 'end'); } }
-        else if(act==='paste') { try { const t = await navigator.clipboard.readText(); editor.setRangeText(t, s, e, 'end'); } catch(err){alert("Pano izni gerekli.");} }
-        else if(act==='selectAll') { editor.focus(); editor.select(); }
-        else if(act==='delete') { editor.setRangeText('', s, e, 'end'); }
-        updateLines(); iosMenu.classList.remove('active');
-    }
+/* SAVE */
+function save(as){
+let t=tabs.find(t=>t.id==cur);
+let n=t.name;
+if(as){n=prompt("Ad",n);t.name=n}
+let b=new Blob([ed.value],{type:mime(n)});
+let a=document.createElement('a');
+a.href=URL.createObjectURL(b);
+a.download=n;a.click();
+}
 
-    editor.oninput = () => {
-        updateLines(); const a = tabs.find(t=>t.id===activeTabId);
-        if(!isProg){
-            if(a.historyIndex < a.history.length-1) a.history = a.history.slice(0, a.historyIndex+1);
-            a.history.push(editor.value); a.historyIndex++;
-        }
-        isProg = false;
-    };
+/* FILE */
+function openFile(){f.click()}
+f.onchange=e=>{
+let r=new FileReader();
+r.onload=x=>{
+let t=tabs.find(t=>t.id==cur);
+t.content=x.target.result;
+t.name=e.target.files[0].name;
+switchTab(t.id);
+}
+r.readAsText(e.target.files[0]);
+}
 
-    editor.onscroll = () => { lineNumbers.scrollTop = editor.scrollTop; iosMenu.classList.remove('active'); };
-    editor.oncontextmenu = (e) => { e.preventDefault(); iosMenu.style.left = Math.min(e.pageX, window.innerWidth - 320) + 'px'; iosMenu.style.top = (e.pageY - 50) + 'px'; iosMenu.classList.add('active'); };
-    
-    // --- 5. GELİŞMİŞ ARAMA ---
-    document.getElementById('btnSearchNext').onclick = () => {
-        const t = editor.value.toLowerCase(), w = document.getElementById('searchInput').value.toLowerCase();
-        if(!w) return; const idx = t.indexOf(w, lastSearchIdx);
-        if(idx !== -1) { editor.focus(); editor.setSelectionRange(idx, idx + w.length); lastSearchIdx = idx + w.length; }
-        else { lastSearchIdx = 0; alert("Bitti"); }
-    };
+/* UNDO REDO */
+function undo(){
+let t=tabs.find(t=>t.id==cur);
+if(t.i>0){t.i--;ed.value=t.h[t.i];update();}
+}
+function redo(){
+let t=tabs.find(t=>t.id==cur);
+if(t.i<t.h.length-1){t.i++;ed.value=t.h[t.i];update();}
+}
 
-    document.getElementById('btnMenuToggle').onclick = (e) => { e.stopPropagation(); mainMenu.classList.toggle('active'); };
-    document.getElementById('menuOpen').onclick = () => fileInput.click();
-    document.getElementById('menuSave').onclick = () => saveFile(false);
-    document.getElementById('menuSaveAs').onclick = () => saveFile(true);
-    document.getElementById('btnRun').onclick = () => { document.getElementById('previewOverlay').style.display='flex'; document.getElementById('previewFrame').srcdoc = editor.value; };
-    
-    fileInput.onchange = (e) => {
-        const f = e.target.files[0]; if(!f) return;
-        const r = new FileReader(); r.onload = (ev) => { const a = tabs.find(t=>t.id===activeTabId); a.name = f.name; a.content = ev.target.result; switchTab(a.id); };
-        r.readAsText(f);
-    };
+/* SEARCH */
+function searchBox(){search.classList.add('active')}
+function find(){
+let txt=ed.value.toLowerCase();
+let w=sTxt.value.toLowerCase();
+let i=txt.indexOf(w,last);
+if(i!=-1){
+ed.setSelectionRange(i,i+w.length);
+last=i+w.length;
+}else last=0;
+}
 
-    // Yazı Boyutu ve Tema Hafızası
-    let curFS = parseInt(localStorage.getItem('alpFS')) || 16;
-    const setFS = (s) => { curFS = s; document.documentElement.style.setProperty('--editor-font-size', s + 'px'); document.getElementById('fontSizeDisplay').textContent = s + 'px'; localStorage.setItem('alpFS', s); };
-    document.getElementById('menuFontSize').onclick = () => { document.getElementById('fontSizePopup').classList.add('active'); mainMenu.classList.remove('active'); };
-    document.getElementById('btnFontInc').onclick = () => setFS(curFS + 1); document.getElementById('btnFontDec').onclick = () => setFS(curFS - 1);
-    document.getElementById('menuTheme').onclick = () => { document.body.classList.toggle('dark-theme'); localStorage.setItem('alpTheme', document.body.classList.contains('dark-theme')?'dark':'light'); };
-    document.getElementById('menuUndo').onclick = () => { const a = tabs.find(t=>t.id===activeTabId); if(a.historyIndex > 0) { a.historyIndex--; isProg=true; editor.value = a.history[a.historyIndex]; updateLines(); } };
-    document.getElementById('menuRedo').onclick = () => { const a = tabs.find(t=>t.id===activeTabId); if(a.historyIndex < a.history.length - 1) { a.historyIndex++; isProg=true; editor.value = a.history[a.historyIndex]; updateLines(); } };
+/* FONT */
+function fontBox(){font.classList.add('active')}
+function setFS(v){
+fs=v;
+document.documentElement.style.setProperty('--fs',v+'px');
+fsTxt.textContent=v+'px';
+localStorage.setItem('fs',v);
+}
 
-    // Sağ Tık Aksiyonları
-    document.getElementById('ctxSearch').onclick = () => { document.getElementById('searchPopup').classList.add('active'); iosMenu.classList.remove('active'); };
-    document.getElementById('ctxCopy').onclick = () => handleAction('copy');
-    document.getElementById('ctxCut').onclick = () => handleAction('cut');
-    document.getElementById('ctxPaste').onclick = () => handleAction('paste');
-    document.getElementById('ctxSelectAll').onclick = () => handleAction('selectAll');
-    document.getElementById('ctxDelete').onclick = () => handleAction('delete');
+/* THEME */
+function toggleTheme(){
+document.body.classList.toggle('dark');
+localStorage.setItem('theme',document.body.classList.contains('dark'));
+}
 
-    window.onclick = () => { mainMenu.classList.remove('active'); iosMenu.classList.remove('active'); };
-    if(localStorage.getItem('alpTheme') === 'light') document.body.classList.remove('dark-theme');
-    setFS(curFS); addTab();
+/* CLIPBOARD */
+async function act(a){
+let s=ed.selectionStart,e=ed.selectionEnd;
+if(a=='copy') await navigator.clipboard.writeText(ed.value.substring(s,e));
+if(a=='cut'){
+await navigator.clipboard.writeText(ed.value.substring(s,e));
+ed.setRangeText('',s,e);
+}
+if(a=='paste'){
+let t=await navigator.clipboard.readText();
+ed.setRangeText(t,s,e);
+}
+ctx.classList.remove('active');
+}
 
-    // PWA Service Worker (KORUNDU)
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); }); }
+/* CONTEXT */
+ed.oncontextmenu=e=>{
+e.preventDefault();
+ctx.style.left=e.clientX+'px';
+ctx.style.top=e.clientY+'px';
+ctx.classList.add('active');
+}
+
+/* MENU */
+menuBtn.onclick=e=>{
+e.stopPropagation();
+menu.classList.toggle('active');
+}
+window.onclick=()=>{menu.classList.remove('active');ctx.classList.remove('active')}
+
+/* PREVIEW */
+run.onclick=()=>{
+preview.style.display='flex';
+frame.srcdoc=ed.value;
+}
+
+/* INIT */
+fs=parseInt(localStorage.getItem('fs'))||16;
+setFS(fs);
+if(localStorage.getItem('theme')==='false')document.body.classList.remove('dark');
+
+addTab();
 </script>
 </body>
 </html>
