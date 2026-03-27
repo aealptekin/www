@@ -618,8 +618,7 @@
                 const reader = new FileReader();
                 reader.onload = (e) => this.newTab(file.name, e.target.result);
                 reader.readAsText(file);
-                this.el.fileInput.value = '';
-            },
+                this.el.fileInput.
 
             async handleZip(file) {
                 if(!file) return;
@@ -631,10 +630,12 @@
                         const content = await zip.files[files[0]].async('string');
                         this.newTab(files[0], content);
                     }
-                } catch(e) { alert('ZIP hatası'); }
+                } catch(e) { 
+                    alert('ZIP hatası'); 
+                }
                 this.el.zipInput.value = '';
             },
-
+            
             saveFile() {
                 const tab = this.getActiveTab();
                 if(!tab) return;
@@ -683,38 +684,41 @@
                     'cfg': 'text/plain',
                     'conf': 'text/plain'
                 };
-    
-    // Varsayılan olarak text/plain kullan, uzantı bulunamazsa veya tanımlı değilse
-    const contentType = mimeTypes[extension] || 'text/plain';
-    
-    const blob = new Blob([this.el.editor.value], {type: contentType});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    tab.modified = false;
-    this.renderTabs();
-}
-
+                
+                // Varsayılan olarak text/plain kullan, uzantı bulunamazsa veya tanımlı değilse
+                const contentType = mimeTypes[extension] || 'text/plain';
+                
+                const blob = new Blob([this.el.editor.value], {type: contentType});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                tab.modified = false;
+                this.renderTabs();
+            },
+            
             async saveZip() {
                 const tab = this.getActiveTab();
                 if(!tab) return;
+                
                 const zip = new JSZip();
                 zip.file(tab.name, this.el.editor.value);
                 const blob = await zip.generateAsync({type: 'blob'});
+                
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = tab.name.replace(/\.[^/.]+$/, '') + '.zip';
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             },
-
             openSearch() {
                 this.el.searchBox.classList.add('show');
                 this.el.searchOverlay.classList.add('show');
