@@ -9,6 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <style>
+        /* 1. ANA TEMALANDIRMA (Senin Orijinal Renklerin) */
         :root {
             --ios-bg: #f2f2f7;
             --ios-header: rgba(248, 248, 248, 0.85);
@@ -46,6 +47,7 @@
             -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s;
         }
 
+        /* 2. HEADER & GLASSMORPHISM */
         header {
             background-color: var(--ios-header);
             backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
@@ -55,9 +57,10 @@
             position: relative; z-index: 100;
         }
 
-        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; }
         .btn-icon { color: var(--ios-blue); background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
 
+        /* 3. MENÜLER & POPUPLAR */
         .dropdown-menu, .popup-window, .ios-context-menu {
             background-color: var(--ios-menu-bg);
             backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
@@ -67,17 +70,19 @@
 
         .dropdown-menu { position: absolute; top: calc(100% + 5px); right: 10px; flex-direction: column; overflow: hidden; z-index: 500; }
         .dropdown-menu.active { display: flex; }
-        .dropdown-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; width: 170px; cursor: pointer; }
+        .dropdown-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; width: 180px; cursor: pointer; }
         .dropdown-menu button.action-btn { color: var(--ios-text); }
         .dropdown-menu button:last-child { border-bottom: none; }
-        .menu-divider { height: 4px; background-color: var(--ios-border); border:none; }
+        .menu-divider { height: 4px; background-color: var(--ios-border); border:none; padding:0; }
 
+        /* 4. SEKMELER */
         .tabs-container { display: flex; background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
         .tabs-container::-webkit-scrollbar { display: none; } 
         .tab { padding: 10px 15px; font-size: 14px; color: var(--ios-text); background-color: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .tab.active { background-color: var(--ios-tab-active); font-weight: 600; border-bottom: 2px solid var(--ios-blue); }
         .tab-close { color: var(--ios-line-num); font-weight: bold; padding: 2px; }
 
+        /* 5. EDİTÖR ALANI */
         .editor-wrapper { display: flex; flex: 1; overflow: hidden; background-color: var(--ios-bg); position: relative; }
         .line-numbers {
             width: 45px; padding: 15px 5px; font-family: var(--editor-font-family);
@@ -92,21 +97,22 @@
             color: var(--ios-text); resize: none; outline: none; white-space: pre; overflow-y: auto;
         }
 
-        /* Toolbar */
+        /* 6. MOBİL ARAÇ ÇUBUĞU */
         .toolbar { display: flex; background: var(--ios-header); border-top: 1px solid var(--ios-border); overflow-x: auto; padding: 8px; gap: 6px; scrollbar-width: none; }
         .toolbar::-webkit-scrollbar { display: none; }
         .toolbar button { background: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 8px; padding: 10px 14px; min-width: 44px; font-family: monospace; font-size: 16px; }
 
-        /* Popups */
+        /* 7. ÖNİZLEME (PREVIEW) - MODERN srcdoc */
+        #previewContainer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 9999; flex-direction: column; }
+        #previewFrame { flex: 1; width: 100%; border: none; background: white; }
+        #previewHeader { background: #f8f8f8; border-bottom: 1px solid #ddd; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: black; }
+
+        /* 8. POPUPLAR (Bul-Değiştir & Yazı Boyutu) */
         .popup-window { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); padding: 15px; flex-direction: column; gap: 10px; z-index: 1000; align-items: center; }
         .popup-window.active { display: flex; }
         .popup-window input { padding: 10px; border-radius: 8px; border: 1px solid var(--ios-border); background: var(--ios-bg); color: var(--ios-text); width: 220px; font-size: 16px; }
 
-        /* Preview */
-        #previewContainer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 2000; }
-        #previewFrame { width: 100%; height: 100%; border: none; }
-        #closePreview { position: fixed; bottom: 30px; right: 30px; background: var(--ios-blue); color: white; border: none; padding: 15px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-
+        /* 9. SAĞ TIK MENÜSÜ */
         .ios-context-menu { position: absolute; flex-direction: row; padding: 0; z-index: 1500; }
         .ios-context-menu.active { display: flex; }
         .ios-context-menu button { background: none; border: none; color: var(--ios-text); font-size: 14px; padding: 10px 14px; white-space: nowrap; cursor: pointer; }
@@ -119,8 +125,8 @@
 
 <header>
     <div class="file-name" id="fileNameDisplay">İsimsiz.html</div>
-    <div>
-        <button class="btn-icon" id="btnPreview" style="margin-right:15px;">👁️</button>
+    <div style="display:flex; gap:10px;">
+        <button class="btn-icon" id="btnRun" title="Çalıştır">▶️</button>
         <button class="btn-icon" id="btnMenuToggle">•••</button>
     </div>
     
@@ -165,7 +171,7 @@
 
 <div class="popup-window" id="searchPopup">
     <input type="text" id="searchInput" placeholder="Aranacak...">
-    <input type="text" id="replaceInput" placeholder="Değiştirilecek (opsiyonel)...">
+    <input type="text" id="replaceInput" placeholder="Yeni kelime...">
     <div style="display:flex; gap:10px;">
         <button id="btnSearchNext" style="color:var(--ios-blue); background:none; border:none; font-weight:bold;">Bul</button>
         <button id="btnReplaceAll" style="color:var(--ios-blue); background:none; border:none; font-weight:bold;">Tümünü Değiştir</button>
@@ -183,11 +189,14 @@
 </div>
 
 <div id="previewContainer">
+    <div id="previewHeader">
+        <span style="font-weight:bold;">Canlı Önizleme</span>
+        <button id="closePreview" style="background:red; color:white; border:none; padding:5px 15px; border-radius:5px;">Kapat</button>
+    </div>
     <iframe id="previewFrame"></iframe>
-    <button id="closePreview">Kapat</button>
 </div>
 
-<input type="file" id="fileInput" accept=".txt,.html,.js,.css,.json,.md">
+<input type="file" id="fileInput" accept=".txt,.html,.js,.css,.json">
 
 <div id="iosMenu" class="ios-context-menu">
     <button id="ctxSearch">Ara</button>
@@ -220,21 +229,19 @@
         if (pairs[e.key]) {
             e.preventDefault();
             const start = this.selectionStart;
-            const end = this.selectionEnd;
-            this.setRangeText(e.key + pairs[e.key], start, end, 'end');
+            this.setRangeText(e.key + pairs[e.key], start, this.selectionEnd, 'end');
             this.selectionStart = this.selectionEnd = start + 1;
         }
     });
 
     function insertAtCursor(text) {
         const start = editor.selectionStart;
-        const end = editor.selectionEnd;
-        editor.setRangeText(text, start, end, 'end');
+        editor.setRangeText(text, start, editor.selectionEnd, 'end');
         editor.focus();
         handleEditorInput();
     }
 
-    // --- 2. SEKME YÖNETİMİ ---
+    // --- 2. SEKME YÖNETİMİ (Korumalı) ---
     function createTab(name = "İsimsiz.html", content = "") {
         tabCounter++;
         const id = tabCounter;
@@ -277,7 +284,7 @@
     }
     document.getElementById('btnAddTab').onclick = () => createTab();
 
-    // --- 3. EDİTÖR ÇEKİRDEK ---
+    // --- 3. EDİTÖR GÜNCELLEME ---
     function updateLines() {
         const count = editor.value.split('\n').length;
         lineNumbers.innerHTML = Array.from({length: count}, (_, i) => i + 1).join('<br>');
@@ -299,19 +306,18 @@
     editor.addEventListener('input', handleEditorInput);
     editor.addEventListener('scroll', () => {
         lineNumbers.scrollTop = editor.scrollTop;
-        document.getElementById('iosMenu').classList.remove('active');
     });
 
-    // --- 4. ÖNİZLEME (PREVIEW) ---
-    document.getElementById('btnPreview').onclick = () => {
+    // --- 4. CANLI ÖNİZLEME (srcdoc Çözümü) ---
+    document.getElementById('btnRun').onclick = () => {
         const frame = document.getElementById('previewFrame');
-        document.getElementById('previewContainer').style.display = 'block';
-        const doc = frame.contentDocument || frame.contentWindow.document;
-        doc.open();
-        doc.write(editor.value);
-        doc.close();
+        document.getElementById('previewContainer').style.display = 'flex';
+        frame.srcdoc = editor.value;
     };
-    document.getElementById('closePreview').onclick = () => document.getElementById('previewContainer').style.display = 'none';
+    document.getElementById('closePreview').onclick = () => {
+        document.getElementById('previewContainer').style.display = 'none';
+        document.getElementById('previewFrame').srcdoc = '';
+    };
 
     // --- 5. BUL & DEĞİŞTİR ---
     let searchIdx = 0;
@@ -323,7 +329,7 @@
             editor.focus();
             editor.setSelectionRange(idx, idx + word.length);
             searchIdx = idx + word.length;
-        } else { searchIdx = 0; alert("Bitti."); }
+        } else { searchIdx = 0; alert("Kelime bitti."); }
     };
     document.getElementById('btnReplaceAll').onclick = () => {
         const s = document.getElementById('searchInput').value;
@@ -331,7 +337,7 @@
         if (s) { editor.value = editor.value.split(s).join(r); handleEditorInput(); }
     };
 
-    // --- 6. MENÜLER & TEMA ---
+    // --- 6. MENÜLER & TEMA & AYARLAR ---
     document.getElementById('btnMenuToggle').onclick = (e) => { e.stopPropagation(); mainMenu.classList.toggle('active'); };
     window.onclick = () => { mainMenu.classList.remove('active'); document.getElementById('iosMenu').classList.remove('active'); };
 
@@ -341,7 +347,7 @@
     };
     if(localStorage.getItem('alpEditorTheme') === 'light') document.body.classList.remove('dark-theme');
 
-    // Yazı Boyutu
+    // Yazı Boyutu Fonksiyonları (Senin Orijinal Yapın)
     let curFS = parseInt(localStorage.getItem('alpEditorFontSize')) || 14;
     function setFS(s) {
         curFS = s;
@@ -354,7 +360,7 @@
     document.getElementById('btnFontDec').onclick = () => setFS(curFS - 1);
     document.getElementById('btnFontClose').onclick = () => document.getElementById('fontSizePopup').classList.remove('active');
 
-    // Dosya İşlemleri
+    // Dosya İşlemleri (Aç/Kaydet)
     document.getElementById('menuOpen').onclick = () => fileInput.click();
     fileInput.onchange = (e) => {
         const f = e.target.files[0];
@@ -375,8 +381,13 @@
         a.download = active.name;
         a.click();
     };
+    document.getElementById('menuSaveAs').onclick = () => {
+        const active = tabs.find(t => t.id === activeTabId);
+        const name = prompt("Dosya adı:", active.name);
+        if(name) { active.name = name; fileNameDisplay.textContent = name; renderTabs(); }
+    };
 
-    // İleri / Geri
+    // İleri / Geri Al
     document.getElementById('menuUndo').onclick = () => {
         const active = tabs.find(t => t.id === activeTabId);
         if(active && active.historyIndex > 0) {
@@ -396,7 +407,7 @@
         }
     };
 
-    // --- 7. SAĞ TIK MENÜSÜ ---
+    // --- 7. SAĞ TIK MENÜSÜ & KES/KOPYALA/YAPIŞTIR ---
     editor.oncontextmenu = (e) => {
         e.preventDefault();
         const m = document.getElementById('iosMenu');
@@ -405,16 +416,29 @@
         m.classList.add('active');
     };
     document.getElementById('ctxSearch').onclick = () => document.getElementById('searchPopup').classList.add('active');
-    document.getElementById('ctxCopy').onclick = () => {
-        navigator.clipboard.writeText(editor.value.substring(editor.selectionStart, editor.selectionEnd));
-    };
+    document.getElementById('ctxCopy').onclick = () => navigator.clipboard.writeText(editor.value.substring(editor.selectionStart, editor.selectionEnd));
     document.getElementById('ctxPaste').onclick = async () => {
-        const t = await navigator.clipboard.readText();
-        editor.setRangeText(t, editor.selectionStart, editor.selectionEnd, 'end');
+        const text = await navigator.clipboard.readText();
+        editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
         handleEditorInput();
     };
 
-    // İlk kurulum
+    // Ana Menüdeki Kes/Kopyala/Yapıştır/Seç
+    document.getElementById('menuCtxCut').onclick = () => {
+        const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+        navigator.clipboard.writeText(sel);
+        editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end');
+        handleEditorInput();
+    };
+    document.getElementById('menuCtxCopy').onclick = () => navigator.clipboard.writeText(editor.value.substring(editor.selectionStart, editor.selectionEnd));
+    document.getElementById('menuCtxPaste').onclick = async () => {
+        const text = await navigator.clipboard.readText();
+        editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
+        handleEditorInput();
+    };
+    document.getElementById('menuCtxSelectAll').onclick = () => editor.select();
+
+    // Başlangıç Kurulumu
     setFS(curFS);
     createTab();
 </script>
