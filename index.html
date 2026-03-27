@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>AlpEditör Pro</title>
+    <title>AlpEditör</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -134,7 +134,14 @@
     function redo(){ let t=tabs.find(x=>x.id===activeTabId); if(t.i<t.his.length-1){t.i++; isProg=true; editor.value=t.his[t.i]; updateLines();} }
 
     document.getElementById('btnMenuToggle').onclick = (e) => { e.stopPropagation(); mainMenu.classList.toggle('active'); };
-
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => console.log('SW kayıtlı:', registration.scope))
+                .catch(error => console.log('SW kayıt hatası:', error));
+        });
+    }
     window.onload = () => {
         const theme = localStorage.getItem('alpTheme') || 'dark';
         if(theme === 'light') document.body.classList.remove('dark-theme');
