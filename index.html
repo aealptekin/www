@@ -448,17 +448,13 @@
             iosMenu.style.left = `${x}px`; iosMenu.style.top = `${y}px`; iosMenu.classList.add('active');
         }
 
-        // Kilitlenmeyen güvenli uzun basma (Sadece bunu eklemen yeterli)
-        let touchTimer;
-        editor.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) { // Sadece tek parmak
-                touchTimer = setTimeout(() => {
-                    showContextMenu(e.touches[0].pageX, e.touches[0].pageY);
-                }, 800); // 800ms kilitlenmeyi önler
-            }
+        editor.addEventListener('contextmenu', (e) => { 
+            e.preventDefault(); 
+            showContextMenu(e.pageX, e.pageY); 
         });
-        editor.addEventListener('touchend', () => clearTimeout(touchTimer));
-        editor.addEventListener('touchmove', () => clearTimeout(touchTimer));EventListener('click', (e) => { 
+
+        // 2. Ana Menü Aç/Kapat Mantığı
+        btnMenuToggle.addEventListener('click', (e) => { 
             e.stopPropagation(); 
             mainMenu.classList.toggle('active'); 
         });
