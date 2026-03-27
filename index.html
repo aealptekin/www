@@ -8,115 +8,258 @@
     <title>AlpEditör</title>
     <link rel="manifest" href="manifest.json">
     <style>
+        /* ZOOM (SAYFA BÜYÜMESİ) ENGELLENDİ */
+        * { touch-action: manipulation; }
+
         /* Varsayılan (Açık) iOS Stili */
         :root {
-            --ios-bg: #f2f2f7; --ios-header: #f8f8f8; --ios-blue: #007AFF;
-            --ios-border: #c6c6c8; --ios-text: #000000; --ios-menu-bg: rgba(250, 250, 250, 0.95);
-            --ios-tab-bg: #e5e5ea; --ios-tab-active: #ffffff; --ios-line-num: #8e8e93;
+            --ios-bg: #f2f2f7;
+            --ios-header: #f8f8f8;
+            --ios-blue: #007AFF;
+            --ios-border: #c6c6c8;
+            --ios-text: #000000;
+            --ios-menu-bg: rgba(250, 250, 250, 0.95);
+            --ios-tab-bg: #e5e5ea;
+            --ios-tab-active: #ffffff;
+            --ios-line-num: #8e8e93;
             --editor-font-size: 16px; 
         }
 
         /* Karanlık Tema */
         body.dark-theme {
-            --ios-bg: #000000; --ios-header: #1c1c1e; --ios-blue: #0a84ff;
-            --ios-border: #38383a; --ios-text: #ffffff; --ios-menu-bg: rgba(40, 40, 40, 0.95);
-            --ios-tab-bg: #2c2c2e; --ios-tab-active: #000000; --ios-line-num: #636366;
+            --ios-bg: #000000;
+            --ios-header: #1c1c1e;
+            --ios-blue: #0a84ff;
+            --ios-border: #38383a;
+            --ios-text: #ffffff;
+            --ios-menu-bg: rgba(40, 40, 40, 0.95);
+            --ios-tab-bg: #2c2c2e;
+            --ios-tab-active: #000000;
+            --ios-line-num: #636366;
         }
 
-        /* ZOOM (SAYFA BÜYÜMESİ) KESİNLİKLE ENGELLENDİ */
-        * { touch-action: manipulation; }
-
         body {
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--ios-bg); color: var(--ios-text);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
-            -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* Üst Çentik Alanı ve Header */
         header {
-            background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 15px; padding-top: max(15px, env(safe-area-inset-top)); 
-            position: relative; z-index: 100;
+            background-color: var(--ios-header);
+            border-bottom: 1px solid var(--ios-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            padding-top: max(15px, env(safe-area-inset-top)); 
+            position: relative;
+            z-index: 100;
         }
 
-        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
-        .btn-icon { color: var(--ios-blue); background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
+        .file-name {
+            font-size: 17px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60%;
+        }
 
-        /* 3 Nokta Menüsü */
+        .btn-icon {
+            color: var(--ios-blue);
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 5px;
+            line-height: 1;
+        }
+
+        /* 3 Nokta Menüsü (KAYDIRILABİLİR YAPILDI) */
         .dropdown-menu {
-            position: absolute; top: calc(100% + 5px); right: 10px;
-            background-color: var(--ios-menu-bg); border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            display: none; flex-direction: column; overflow-y: auto; max-height: 70vh; border: 1px solid var(--ios-border);
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 10px;
+            background-color: var(--ios-menu-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 70vh; /* Ekrana sığması için */
+            border: 1px solid var(--ios-border);
         }
+
         .dropdown-menu.active { display: flex; }
-        .dropdown-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; width: 170px; cursor: pointer; }
+
+        .dropdown-menu button {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--ios-border);
+            padding: 12px 20px;
+            font-size: 16px;
+            color: var(--ios-blue);
+            text-align: left;
+            width: 170px;
+            cursor: pointer;
+        }
         .dropdown-menu button:last-child { border-bottom: none; }
         .dropdown-menu button:active { background-color: rgba(128,128,128,0.2); }
 
         /* Sekmeler Alanı */
-        .tabs-container { display: flex; background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
+        .tabs-container {
+            display: flex;
+            background-color: var(--ios-header);
+            border-bottom: 1px solid var(--ios-border);
+            overflow-x: auto;
+            scrollbar-width: none; 
+        }
         .tabs-container::-webkit-scrollbar { display: none; } 
-        .tab { padding: 10px 15px; font-size: 14px; color: var(--ios-text); background-color: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        .tab {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: var(--ios-text);
+            background-color: var(--ios-tab-bg);
+            border-right: 1px solid var(--ios-border);
+            white-space: nowrap;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .tab.active { background-color: var(--ios-tab-active); font-weight: 600; }
         .tab-close { color: var(--ios-line-num); font-weight: bold; padding: 2px; }
-        .add-tab-btn { padding: 10px 15px; background: transparent; border: none; color: var(--ios-blue); font-size: 20px; cursor: pointer; }
+
+        .add-tab-btn {
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: var(--ios-blue);
+            font-size: 20px;
+            cursor: pointer;
+        }
 
         /* Editör ve Satır Numaraları */
-        .editor-wrapper { display: flex; flex: 1; overflow: hidden; background-color: var(--ios-tab-active); }
-        .line-numbers {
-            width: 30px; padding: 15px 3px; font-family: monospace; font-size: 13px; 
-            line-height: 1.5; color: var(--ios-line-num); text-align: right;
-            background-color: var(--ios-header); border-right: 1px solid var(--ios-border); overflow: hidden; user-select: none;
-        }
-        textarea {
-            flex: 1; width: 100%; border: none; padding: 15px;
-            font-size: var(--editor-font-size); line-height: 1.5; font-family: monospace;
-            background-color: transparent; color: var(--ios-text);
-            resize: none; outline: none; box-sizing: border-box; -webkit-appearance: none; overflow-y: auto; white-space: pre;
+        .editor-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            background-color: var(--ios-tab-active);
         }
 
-        /* ALT TOOLBAR (KODLAMA ÇUBUĞU) */
-        .toolbar {
-            display: flex; background-color: var(--ios-header); border-top: 1px solid var(--ios-border);
-            overflow-x: auto; padding: 8px; gap: 6px; scrollbar-width: none;
+        /* SIRA NUMARALARI İNCELTİLDİ VE KÜÇÜLTÜLDÜ */
+        .line-numbers {
+            width: 30px; 
+            padding: 15px 3px;
+            font-family: monospace;
+            font-size: 13px; 
+            line-height: 1.5;
+            color: var(--ios-line-num);
+            text-align: right;
+            background-color: var(--ios-header);
+            border-right: 1px solid var(--ios-border);
+            overflow: hidden;
+            user-select: none;
         }
-        .toolbar::-webkit-scrollbar { display: none; }
-        .toolbar button { background-color: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 8px; padding: 10px; min-width: 44px; font-family: monospace; font-size: 15px; cursor: pointer; }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            border: none;
+            padding: 15px;
+            font-size: var(--editor-font-size); 
+            line-height: 1.5;
+            font-family: monospace;
+            background-color: transparent;
+            color: var(--ios-text);
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            overflow-y: auto;
+            white-space: pre;
+        }
 
         /* Ortak Popup Stilleri */
         .popup-window {
-            position: absolute; top: max(60px, calc(env(safe-area-inset-top) + 50px)); left: 50%; transform: translateX(-50%);
-            background-color: var(--ios-menu-bg); padding: 10px; border-radius: 10px; display: none; gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 200; border: 1px solid var(--ios-border); align-items: center;
+            position: absolute;
+            top: max(60px, calc(env(safe-area-inset-top) + 50px));
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--ios-menu-bg);
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 200;
+            border: 1px solid var(--ios-border);
+            align-items: center;
         }
         .popup-window.active { display: flex; }
 
         /* Arama Popup */
-        #searchPopup input { padding: 8px; border-radius: 6px; border: 1px solid var(--ios-border); font-size: 16px; width: 140px; }
-        #searchPopup button { background: transparent; color: var(--ios-blue); border: none; font-size: 16px; cursor: pointer; padding: 0 5px; font-weight: bold;}
+        #searchPopup input { padding: 8px; border-radius: 6px; border: 1px solid var(--ios-border); font-size: 16px; width: 150px; }
+        #searchPopup button { background: transparent; color: var(--ios-blue); border: none; font-size: 16px; cursor: pointer; }
 
         /* Yazı Boyutu Popup */
-        #fontSizePopup button { background: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 6px; font-size: 20px; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #fontSizePopup button {
+            background: var(--ios-tab-bg);
+            color: var(--ios-text);
+            border: 1px solid var(--ios-border);
+            border-radius: 6px;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #fontSizePopup button:active { opacity: 0.7; }
         #fontSizePopup .close-btn { background: transparent; color: red; border: none; font-size: 16px; width: auto; height: auto; padding: 0 10px;}
         .font-size-value { font-size: 16px; font-weight: bold; width: 45px; text-align: center; color: var(--ios-text); }
 
-        /* iOS Stili Basılı Tutma Menüsü (DİKEY - EKRANDAN TAŞMAZ) */
+        /* iOS Stili Basılı Tutma Menüsü (DİKEYE ÇEVRİLDİ) */
         .ios-context-menu {
-            position: absolute; background-color: var(--ios-menu-bg); border-radius: 10px;
-            display: flex; flex-direction: column; width: 150px; padding: 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            transition: opacity 0.2s ease, transform 0.2s ease; transform: scale(0.95); opacity: 0; pointer-events: none; border: 1px solid var(--ios-border);
+            position: absolute;
+            background-color: var(--ios-menu-bg);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column; /* YATAYDAN DİKEYE */
+            width: 140px; /* SABİT GENİŞLİK */
+            padding: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: scale(0.95);
+            opacity: 0;
+            pointer-events: none;
         }
         .ios-context-menu.active { opacity: 1; transform: scale(1); pointer-events: auto; }
-        .ios-context-menu button { background: none; border: none; color: var(--ios-text); font-size: 15px; padding: 12px 14px; text-align: left; cursor: pointer; width: 100%; border-bottom: 1px solid var(--ios-border); }
-        .ios-context-menu button:last-child { border-bottom: none; }
+        .ios-context-menu button { background: none; border: none; color: var(--ios-text); font-size: 15px; padding: 12px 14px; cursor: pointer; text-align: left; }
+        .ios-context-menu .divider { height: 1px; width: 100%; background-color: var(--ios-border); margin: 0; }
 
-        /* CANLI ÖNİZLEME OVERLAY */
+        input[type="file"] { display: none; }
+
+        /* CANLI ÖNİZLEME OVERLAY (EKLENDİ) */
         #previewOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--ios-bg); z-index: 6000; flex-direction: column;
@@ -125,8 +268,6 @@
             background-color: var(--ios-header); padding: 12px 15px; padding-top: max(15px, env(safe-area-inset-top)); 
             border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; color: var(--ios-text);
         }
-        
-        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -134,7 +275,7 @@
     <header>
         <div class="file-name" id="fileNameDisplay">İsimsiz.txt</div>
         <div style="display: flex; gap: 5px;">
-            <button class="btn-icon" id="btnRun" title="Önizleme">▶️</button>
+            <button class="btn-icon" id="btnPreviewPlay" title="Önizleme">▶️</button>
             <button class="btn-icon" id="btnMenuToggle">•••</button>
         </div>
         
@@ -144,16 +285,16 @@
             <button id="menuSaveAs">Farklı Kaydet</button>
             <button id="menuUndo">Geri Al</button>
             <button id="menuRedo">İleri Al</button>
-            <button id="menuPreview">Canlı Önizleme</button>
             <button id="menuFontSize">Yazı Boyutu</button> 
             <button id="menuTheme">Tema Değiştir</button>
             <div style="height:1px; background-color:var(--ios-border); margin:2px 0;"></div>
-            <button id="menuSearch" style="color:var(--ios-text)">Ara</button>
-            <button id="menuCut" style="color:var(--ios-text)">Kes</button>
-            <button id="menuCopy" style="color:var(--ios-text)">Kopyala</button>
-            <button id="menuPaste" style="color:var(--ios-text)">Yapıştır</button>
-            <button id="menuDelete" style="color:red">Sil</button>
-            <button id="menuSelectAll" style="color:var(--ios-text)">Tümünü Seç</button>
+            <button id="menuPreviewText">Canlı Önizleme</button>
+            <button id="menuSearchText">Ara</button>
+            <button id="menuCutText" style="color:var(--ios-text)">Kes</button>
+            <button id="menuCopyText" style="color:var(--ios-text)">Kopyala</button>
+            <button id="menuPasteText" style="color:var(--ios-text)">Yapıştır</button>
+            <button id="menuDeleteText" style="color:red">Sil</button>
+            <button id="menuSelectAllText" style="color:var(--ios-text)">Tümünü Seç</button>
         </div>
     </header>
 
@@ -167,21 +308,9 @@
         <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="none" wrap="off"></textarea>
     </div>
 
-    <div class="toolbar">
-        <button onclick="insertText('\t')">TAB</button>
-        <button onclick="insertText('<')">&lt;</button>
-        <button onclick="insertText('>')">&gt;</button>
-        <button onclick="insertText('/')">/</button>
-        <button onclick="insertText('{')">{</button>
-        <button onclick="insertText('}')">}</button>
-        <button onclick="insertText(';')">;</button>
-        <button onclick="insertText('=')">=</button>
-    </div>
-
     <div class="popup-window" id="searchPopup">
         <input type="text" id="searchInput" placeholder="Kelime ara...">
-        <button id="btnSearchPrev">▲</button>
-        <button id="btnSearchNext">▼</button>
+        <button id="btnSearchNext">Bul</button>
         <button id="btnSearchClose" style="color: red;">Kapat</button>
     </div>
 
@@ -196,10 +325,14 @@
 
     <div id="iosMenu" class="ios-context-menu">
         <button id="ctxSearch">Ara</button>
+        <div class="divider"></div>
         <button id="ctxCut">Kes</button>
+        <div class="divider"></div>
         <button id="ctxCopy">Kopyala</button>
+        <div class="divider"></div>
         <button id="ctxPaste">Yapıştır</button>
-        <button id="ctxDelete" style="color:red">Sil</button>
+        <div class="divider"></div>
+        <button id="ctxDelete" style="color:red">Sil</button> <div class="divider"></div>
         <button id="ctxSelectAll">Tümünü Seç</button>
     </div>
 
@@ -212,6 +345,7 @@
     </div>
 
     <script>
+        // --- DOM ELEMENTLERİ ---
         const editor = document.getElementById('editor');
         const lineNumbers = document.getElementById('lineNumbers');
         const fileNameDisplay = document.getElementById('fileNameDisplay');
@@ -231,33 +365,9 @@
 
         const iosMenu = document.getElementById('iosMenu');
 
-        // ÖNİZLEME
-        const previewOverlay = document.getElementById('previewOverlay');
-        const previewFrame = document.getElementById('previewFrame');
-        
-        function openPreview() {
-            previewOverlay.style.display = 'flex';
-            previewFrame.srcdoc = editor.value;
-            mainMenu.classList.remove('active');
-        }
-        document.getElementById('btnRun').addEventListener('click', openPreview);
-        document.getElementById('menuPreview').addEventListener('click', openPreview);
-        document.getElementById('btnPreviewClose').addEventListener('click', () => {
-            previewOverlay.style.display = 'none';
-            previewFrame.srcdoc = '';
-        });
-
-        // TOOLBAR FONKSİYONU
-        window.insertText = function(text) {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            editor.setRangeText(text, start, end, 'end');
-            editor.focus();
-            editor.dispatchEvent(new Event('input'));
-        };
-
-        // YAZI BOYUTU
+        // --- YAZI BOYUTU İŞLEMLERİ ---
         let currentFontSize = parseInt(localStorage.getItem('alpEditorFontSize')) || 16;
+
         function applyFontSize(size) {
             document.documentElement.style.setProperty('--editor-font-size', size + 'px');
             fontSizeDisplay.textContent = size + 'px';
@@ -270,17 +380,36 @@
             searchPopup.classList.remove('active');
             mainMenu.classList.remove('active');
         });
-        document.getElementById('btnFontClose').addEventListener('click', () => fontSizePopup.classList.remove('active'));
-        document.getElementById('btnFontInc').addEventListener('click', () => { if (currentFontSize < 40) applyFontSize(++currentFontSize); });
-        document.getElementById('btnFontDec').addEventListener('click', () => { if (currentFontSize > 8) applyFontSize(--currentFontSize); });
 
-        // SEKME YÖNETİMİ
-        let tabs = [], activeTabId = null, tabCounter = 0, isProgrammaticChange = false;
+        document.getElementById('btnFontClose').addEventListener('click', () => {
+            fontSizePopup.classList.remove('active');
+        });
+
+        document.getElementById('btnFontInc').addEventListener('click', () => {
+            if (currentFontSize < 40) {
+                currentFontSize += 1;
+                applyFontSize(currentFontSize);
+            }
+        });
+
+        document.getElementById('btnFontDec').addEventListener('click', () => {
+            if (currentFontSize > 8) {
+                currentFontSize -= 1;
+                applyFontSize(currentFontSize);
+            }
+        });
+
+        // --- SEKME YÖNETİMİ ---
+        let tabs = [];
+        let activeTabId = null;
+        let tabCounter = 0;
 
         function createTab(name = "İsimsiz.txt", content = "") {
             tabCounter++;
-            tabs.push({ id: tabCounter, name, content, history: [content], historyIndex: 0 });
-            renderTabs(); switchTab(tabCounter);
+            const id = tabCounter;
+            tabs.push({ id, name, content, history: [content], historyIndex: 0 });
+            renderTabs();
+            switchTab(id);
         }
 
         function renderTabs() {
@@ -288,9 +417,15 @@
             tabs.forEach(tab => {
                 const tabEl = document.createElement('div');
                 tabEl.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
-                tabEl.innerHTML = `<span class="tab-name">${tab.name}</span><span class="tab-close" data-id="${tab.id}">×</span>`;
+                tabEl.innerHTML = `
+                    <span class="tab-name">${tab.name}</span>
+                    <span class="tab-close" data-id="${tab.id}">×</span>
+                `;
                 tabEl.querySelector('.tab-name').onclick = () => switchTab(tab.id);
-                tabEl.querySelector('.tab-close').onclick = (e) => { e.stopPropagation(); closeTab(tab.id); };
+                tabEl.querySelector('.tab-close').onclick = (e) => {
+                    e.stopPropagation();
+                    closeTab(tab.id);
+                };
                 tabsList.appendChild(tabEl);
             });
         }
@@ -300,11 +435,15 @@
                 const currentTab = tabs.find(t => t.id === activeTabId);
                 if(currentTab) currentTab.content = editor.value;
             }
-            activeTabId = id; const newTab = tabs.find(t => t.id === id);
+            activeTabId = id;
+            const newTab = tabs.find(t => t.id === id);
+            
             isProgrammaticChange = true;
             editor.value = newTab.content;
             fileNameDisplay.textContent = newTab.name;
-            renderTabs(); updateLineNumbers();
+            
+            renderTabs();
+            updateLineNumbers();
         }
 
         function closeTab(id) {
@@ -313,9 +452,10 @@
             if (activeTabId === id) switchTab(tabs[tabs.length - 1].id);
             else renderTabs();
         }
+
         btnAddTab.addEventListener('click', () => createTab());
 
-        // SATIR NUMARALARI VE HISTORY
+        // --- SATIR NUMARALARI SENKRONİZASYONU ---
         function updateLineNumbers() {
             const lines = editor.value.split('\n').length;
             lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => i + 1).join('<br>');
@@ -325,159 +465,339 @@
             updateLineNumbers();
             const active = tabs.find(t => t.id === activeTabId);
             if (!isProgrammaticChange) {
-                if (active.historyIndex < active.history.length - 1) active.history = active.history.slice(0, active.historyIndex + 1);
+                if (active.historyIndex < active.history.length - 1) {
+                    active.history = active.history.slice(0, active.historyIndex + 1);
+                }
                 active.history.push(editor.value);
                 active.historyIndex++;
             }
             isProgrammaticChange = false;
         });
 
-        // DOSYA İŞLEMLERİ
-        document.getElementById('menuOpen').addEventListener('click', () => { fileInput.click(); mainMenu.classList.remove('active'); });
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target.result; const activeTab = tabs.find(t => t.id === activeTabId);
-                activeTab.name = file.name; activeTab.content = content; activeTab.history = [content]; activeTab.historyIndex = 0;
-                isProgrammaticChange = true; editor.value = content; fileNameDisplay.textContent = file.name;
-                renderTabs(); updateLineNumbers();
-            };
-            reader.readAsText(file); fileInput.value = '';
+        editor.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = editor.scrollTop;
+            iosMenu.classList.remove('active');
         });
 
+        // --- 3 NOKTA MENÜ İŞLEMLERİ ---
+        btnMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mainMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!mainMenu.contains(e.target) && e.target !== btnMenuToggle) {
+                mainMenu.classList.remove('active');
+            }
+        });
+
+        // Dosya Aç İşlemi
+        document.getElementById('menuOpen').addEventListener('click', () => {
+            fileInput.click();
+            mainMenu.classList.remove('active');
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                const activeTab = tabs.find(t => t.id === activeTabId);
+                
+                activeTab.name = file.name;
+                activeTab.content = content;
+                activeTab.history = [content];
+                activeTab.historyIndex = 0;
+
+                isProgrammaticChange = true;
+                editor.value = content;
+                fileNameDisplay.textContent = file.name;
+                
+                renderTabs();
+                updateLineNumbers();
+            };
+            reader.readAsText(file);
+            fileInput.value = '';
+        });
+
+        // --- DOSYA İNDİRME VE UZANTI DÜZELTME (YENİ) ---
         function getMimeType(filename) {
+            // Dosya adından uzantıyı alır (örn: "abc.html" -> "html")
             const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
-            const mimeTypes = { 'html': 'text/html', 'js': 'text/javascript', 'css': 'text/css', 'json': 'application/json', 'md': 'text/markdown', 'csv': 'text/csv', 'txt': 'text/plain' };
+            
+            // Uzantılara göre doğru tarayıcı tiplerini belirliyoruz
+            const mimeTypes = {
+                'html': 'text/html',
+                'htm': 'text/html',
+                'js': 'text/javascript',
+                'css': 'text/css',
+                'json': 'application/json',
+                'md': 'text/markdown',
+                'csv': 'text/csv',
+                'xml': 'text/xml',
+                'txt': 'text/plain'
+            };
+            
+            // Eğer bilinen bir uzantıysa onu kullan, değilse "application/octet-stream" kullanarak .txt eklenmesini engelle
             return mimeTypes[ext] || 'application/octet-stream';
         }
 
         function downloadFile(filename, content) {
-            const blob = new Blob([content], { type: getMimeType(filename) });
-            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename;
-            document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+            const mimeType = getMimeType(filename);
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
         }
 
-        document.getElementById('menuSave').addEventListener('click', () => { const activeTab = tabs.find(t => t.id === activeTabId); downloadFile(activeTab.name, editor.value); mainMenu.classList.remove('active'); });
-        document.getElementById('menuSaveAs').addEventListener('click', () => {
-            const activeTab = tabs.find(t => t.id === activeTabId); const newName = prompt("Dosya adı (örn: index.html):", activeTab.name);
-            if (newName && newName.trim() !== "") { activeTab.name = newName.trim(); renderTabs(); fileNameDisplay.textContent = activeTab.name; downloadFile(activeTab.name, editor.value); }
+        document.getElementById('menuSave').addEventListener('click', () => {
+            const activeTab = tabs.find(t => t.id === activeTabId);
+            downloadFile(activeTab.name, editor.value);
             mainMenu.classList.remove('active');
         });
 
-        // UNDO / REDO
+        document.getElementById('menuSaveAs').addEventListener('click', () => {
+            const activeTab = tabs.find(t => t.id === activeTabId);
+            const newName = prompt("Dosya adı (örn: index.html):", activeTab.name);
+            if (newName && newName.trim() !== "") {
+                activeTab.name = newName.trim();
+                renderTabs();
+                fileNameDisplay.textContent = activeTab.name;
+                downloadFile(activeTab.name, editor.value);
+            }
+            mainMenu.classList.remove('active');
+        });
+
+        // İleri / Geri
+        let isProgrammaticChange = false;
         document.getElementById('menuUndo').addEventListener('click', () => {
             const active = tabs.find(t => t.id === activeTabId);
-            if (active.historyIndex > 0) { active.historyIndex--; isProgrammaticChange = true; editor.value = active.history[active.historyIndex]; updateLineNumbers(); }
+            if (active.historyIndex > 0) {
+                active.historyIndex--;
+                isProgrammaticChange = true;
+                editor.value = active.history[active.historyIndex];
+                updateLineNumbers();
+            }
             mainMenu.classList.remove('active');
         });
+
         document.getElementById('menuRedo').addEventListener('click', () => {
             const active = tabs.find(t => t.id === activeTabId);
-            if (active.historyIndex < active.history.length - 1) { active.historyIndex++; isProgrammaticChange = true; editor.value = active.history[active.historyIndex]; updateLineNumbers(); }
+            if (active.historyIndex < active.history.length - 1) {
+                active.historyIndex++;
+                isProgrammaticChange = true;
+                editor.value = active.history[active.historyIndex];
+                updateLineNumbers();
+            }
             mainMenu.classList.remove('active');
         });
 
-        // TEMA
+        // Tema Değiştirme
         document.getElementById('menuTheme').addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
-            localStorage.setItem('alpEditorTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('alpEditorTheme', isDark ? 'dark' : 'light');
             mainMenu.classList.remove('active');
         });
-        if(localStorage.getItem('alpEditorTheme') === 'dark') document.body.classList.add('dark-theme');
 
-        // ARAMA İŞLEMLERİ
+        if(localStorage.getItem('alpEditorTheme') === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        // --- ARAMA İŞLEMLERİ ---
         let lastSearchIndex = 0;
-        function initiateSearch() { searchPopup.classList.add('active'); fontSizePopup.classList.remove('active'); searchInput.focus(); iosMenu.classList.remove('active'); mainMenu.classList.remove('active'); }
-        document.getElementById('menuSearch').addEventListener('click', initiateSearch);
-        document.getElementById('ctxSearch').addEventListener('click', initiateSearch);
-        
-        document.getElementById('btnSearchClose').addEventListener('click', () => { searchPopup.classList.remove('active'); lastSearchIndex = 0; });
-        function performSearch(forward) {
-            const text = editor.value.toLowerCase(), word = searchInput.value.toLowerCase();
+
+        function showSearch() {
+            searchPopup.classList.add('active');
+            fontSizePopup.classList.remove('active');
+            searchInput.focus();
+            iosMenu.classList.remove('active');
+        }
+
+        document.getElementById('btnSearchClose').addEventListener('click', () => {
+            searchPopup.classList.remove('active');
+            lastSearchIndex = 0;
+        });
+
+        document.getElementById('btnSearchNext').addEventListener('click', () => {
+            const text = editor.value.toLowerCase();
+            const word = searchInput.value.toLowerCase();
             if (!word) return;
-            let foundIndex;
-            if (forward) { foundIndex = text.indexOf(word, lastSearchIndex); if (foundIndex === -1) foundIndex = text.indexOf(word); } 
-            else { let searchBefore = lastSearchIndex - word.length - 1; if (searchBefore < 0) searchBefore = text.length; foundIndex = text.lastIndexOf(word, searchBefore); if (foundIndex === -1) foundIndex = text.lastIndexOf(word); }
-            if (foundIndex !== -1) { editor.focus(); editor.setSelectionRange(foundIndex, foundIndex + word.length); lastSearchIndex = foundIndex + word.length; } 
-            else { alert("Kelime bulunamadı."); }
-        }
-        document.getElementById('btnSearchNext').addEventListener('click', () => performSearch(true));
-        document.getElementById('btnSearchPrev').addEventListener('click', () => performSearch(false));
 
-        // ORTAK AKSİYONLAR
-        function handleAction(actionType) {
-            editor.focus();
-            if (actionType === 'selectAll') editor.select();
-            else if (actionType === 'copy') { const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd); if(sel) navigator.clipboard.writeText(sel); }
-            else if (actionType === 'cut') {
-                const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-                if (sel) { navigator.clipboard.writeText(sel).then(() => { editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input')); }); }
+            const foundIndex = text.indexOf(word, lastSearchIndex);
+            
+            if (foundIndex !== -1) {
+                editor.focus();
+                editor.setSelectionRange(foundIndex, foundIndex + word.length);
+                lastSearchIndex = foundIndex + word.length;
+            } else {
+                lastSearchIndex = 0; 
+                alert("Metin sonuna ulaşıldı veya kelime bulunamadı.");
             }
-            else if (actionType === 'paste') {
-                navigator.clipboard.readText().then(text => { editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input')); }).catch(() => alert("Pano izni yok."));
-            }
-            else if (actionType === 'delete') {
-                if (editor.selectionStart !== editor.selectionEnd) { editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input')); }
-            }
-            mainMenu.classList.remove('active'); iosMenu.classList.remove('active');
-        }
+        });
 
-        document.getElementById('menuSelectAll').addEventListener('click', () => handleAction('selectAll'));
-        document.getElementById('menuCopy').addEventListener('click', () => handleAction('copy'));
-        document.getElementById('menuCut').addEventListener('click', () => handleAction('cut'));
-        document.getElementById('menuPaste').addEventListener('click', () => handleAction('paste'));
-        document.getElementById('menuDelete').addEventListener('click', () => handleAction('delete'));
-
-        document.getElementById('ctxSelectAll').addEventListener('click', () => handleAction('selectAll'));
-        document.getElementById('ctxCopy').addEventListener('click', () => handleAction('copy'));
-        document.getElementById('ctxCut').addEventListener('click', () => handleAction('cut'));
-        document.getElementById('ctxPaste').addEventListener('click', () => handleAction('paste'));
-        document.getElementById('ctxDelete').addEventListener('click', () => handleAction('delete'));
-
-
-        // --- KİLİTLENME VE MENÜ KAPATMA DÜZELTMELERİ ---
-        
-        // 1. Manuel TouchTimer tamamen kaldırıldı. Sadece sistemin kendi contextmenu olayına güveniyoruz.
-        // Bu sayede iOS/Android'in kendi metin seçme baloncuklarıyla kavga etmemiş oluyoruz.
-        function showContextMenu(eX, eY) {
-            let x = eX; let y = eY - 50;
-            const menuWidth = 150; const menuHeight = 250;
+        // --- BASILI TUTMA MENÜSÜ ---
+        // (Ekran dışına taşmayı engelleyecek şekilde GÜNCELLENDİ)
+        function openContextMenu(pageX, pageY) {
+            let x = pageX;
+            let y = pageY - 50;
+            const menuWidth = 140; 
+            const menuHeight = 250;
             if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - 10;
             if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - 10;
             if (y < 10) y = 10;
-            iosMenu.style.left = `${x}px`; iosMenu.style.top = `${y}px`; iosMenu.classList.add('active');
+
+            iosMenu.style.left = `${x}px`;
+            iosMenu.style.top = `${y}px`;
+            iosMenu.classList.add('active');
         }
 
-        editor.addEventListener('contextmenu', (e) => { 
-            e.preventDefault(); 
-            showContextMenu(e.pageX, e.pageY); 
+        editor.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            openContextMenu(e.pageX, e.pageY);
         });
 
-        // 2. Ana Menü Aç/Kapat Mantığı
-        btnMenuToggle.addEventListener('click', (e) => { 
-            e.stopPropagation(); 
-            mainMenu.classList.toggle('active'); 
-        });
-
-        // 3. Ekrana (özellikle boşluklara) tıklandığında menüleri KAPATMA garantisi.
         document.addEventListener('click', (e) => {
-            // Eğer tıklanan yer Ana Menü veya Ana Menü butonu değilse Ana Menüyü kapat.
-            if (!mainMenu.contains(e.target) && e.target !== btnMenuToggle) {
-                mainMenu.classList.remove('active');
-            }
-            // Eğer tıklanan yer Context (Sağ Tık) Menüsü değilse, Context Menüyü anında kapat.
-            if (!iosMenu.contains(e.target)) {
+            if (!iosMenu.contains(e.target) && e.target !== editor) {
                 iosMenu.classList.remove('active');
             }
         });
 
-        // Kullanıcı yazmaya başladığında veya scroll ettiğinde de menüleri kapat.
-        editor.addEventListener('input', () => { iosMenu.classList.remove('active'); });
-        editor.addEventListener('scroll', () => { iosMenu.classList.remove('active'); });
+        document.getElementById('ctxSearch').addEventListener('click', showSearch);
+        document.getElementById('ctxSelectAll').addEventListener('click', () => { editor.focus(); editor.select(); iosMenu.classList.remove('active'); });
+        
+        document.getElementById('ctxCopy').addEventListener('click', () => {
+            const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if(sel) navigator.clipboard.writeText(sel);
+            iosMenu.classList.remove('active');
+        });
 
+        document.getElementById('ctxCut').addEventListener('click', () => {
+            const start = editor.selectionStart, end = editor.selectionEnd;
+            const sel = editor.value.substring(start, end);
+            if (sel) {
+                navigator.clipboard.writeText(sel).then(() => {
+                    editor.setRangeText('', start, end, 'end');
+                    editor.dispatchEvent(new Event('input'));
+                });
+            }
+            iosMenu.classList.remove('active');
+        });
+
+        document.getElementById('ctxPaste').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
+                editor.dispatchEvent(new Event('input'));
+            } catch (e) { alert("Pano izni yok."); }
+            iosMenu.classList.remove('active');
+        });
+
+        // İlk sekmeyi başlat
         createTab();
 
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(e => console.log(e)); }); }
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW kayıtlı:', registration.scope))
+                    .catch(error => console.log('SW kayıt hatası:', error));
+            });
+        }
+
+        // =========================================================================
+        // BUNDAN SONRASI BENİM SADECE EKSİK OLANLARI BAĞLADIĞIM GÜVENLİ KISIMDIR
+        // =========================================================================
+
+        // 1. ÖNİZLEME BUTONLARI (Overlay'i açar)
+        const previewOverlay = document.getElementById('previewOverlay');
+        const previewFrame = document.getElementById('previewFrame');
+        
+        function openPreview() {
+            previewOverlay.style.display = 'flex';
+            previewFrame.srcdoc = editor.value;
+            mainMenu.classList.remove('active');
+        }
+        document.getElementById('btnPreviewPlay').addEventListener('click', openPreview);
+        document.getElementById('menuPreviewText').addEventListener('click', openPreview);
+        document.getElementById('btnPreviewClose').addEventListener('click', () => {
+            previewOverlay.style.display = 'none';
+            previewFrame.srcdoc = '';
+        });
+
+        // 2. 3 NOKTA MENÜSÜNE EKLENEN KES/KOPYALA BUTONLARININ BAĞLANTILARI
+        document.getElementById('menuSearchText').addEventListener('click', showSearch);
+        document.getElementById('menuSelectAllText').addEventListener('click', () => { editor.focus(); editor.select(); mainMenu.classList.remove('active'); });
+        
+        document.getElementById('menuCopyText').addEventListener('click', () => {
+            const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if(sel) navigator.clipboard.writeText(sel);
+            mainMenu.classList.remove('active');
+        });
+
+        document.getElementById('menuCutText').addEventListener('click', () => {
+            const start = editor.selectionStart, end = editor.selectionEnd;
+            const sel = editor.value.substring(start, end);
+            if (sel) {
+                navigator.clipboard.writeText(sel).then(() => {
+                    editor.setRangeText('', start, end, 'end');
+                    editor.dispatchEvent(new Event('input'));
+                });
+            }
+            mainMenu.classList.remove('active');
+        });
+
+        document.getElementById('menuPasteText').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, 'end');
+                editor.dispatchEvent(new Event('input'));
+            } catch (e) { alert("Pano izni yok."); }
+            mainMenu.classList.remove('active');
+        });
+
+        document.getElementById('menuDeleteText').addEventListener('click', () => {
+            const start = editor.selectionStart, end = editor.selectionEnd;
+            if (start !== end) {
+                editor.setRangeText('', start, end, 'end');
+                editor.dispatchEvent(new Event('input'));
+            }
+            mainMenu.classList.remove('active');
+        });
+
+        // Sağ Tık Menüsüne Sil Butonu Bağlantısı
+        document.getElementById('ctxDelete').addEventListener('click', () => {
+            const start = editor.selectionStart, end = editor.selectionEnd;
+            if (start !== end) {
+                editor.setRangeText('', start, end, 'end');
+                editor.dispatchEvent(new Event('input'));
+            }
+            iosMenu.classList.remove('active');
+        });
+
+        // 3. KİLİTLENMEYEN GÜVENLİ UZUN BASMA (SENİN ONAYLADIĞIN 800ms)
+        let touchTimer;
+        editor.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) { 
+                touchTimer = setTimeout(() => {
+                    openContextMenu(e.touches[0].pageX, e.touches[0].pageY);
+                }, 800); 
+            }
+        });
+        editor.addEventListener('touchend', () => clearTimeout(touchTimer));
+        editor.addEventListener('touchmove', () => clearTimeout(touchTimer));
+
     </script>
 </body>
 </html>
