@@ -7,10 +7,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1e1e1e">
     <title>ProCode Editor</title>
-    
-    <link rel="manifest" id="dynamic-manifest">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    
     <style>
         :root {
             --bg: #1e1e1e;
@@ -22,7 +21,6 @@
             --tab-bg: #2d2d2d;
             --tab-active: #1e1e1e;
             --button: #0e639c;
-            --editor-font: 'Menlo', 'Monaco', 'Courier New', monospace;
             --font-size: 14px;
         }
 
@@ -31,36 +29,16 @@
             --header: #f3f3f3;
             --accent: #0078d4;
             --border: #e0e0e0;
-            --text: #333333;
-            --text-muted: #808080;
+            --text: #333;
             --tab-bg: #ececec;
             --tab-active: #ffffff;
-            --button: #0078d4;
         }
 
-        * {
-            -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body {
-            height: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        #app {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        /* Header */
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; height: 100dvh; overflow: hidden; font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+        
+        #app { display: flex; flex-direction: column; height: 100%; }
+        
         #header {
             background: var(--header);
             border-bottom: 1px solid var(--border);
@@ -72,19 +50,9 @@
             flex-shrink: 0;
         }
 
-        #filename {
-            flex: 1;
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 14px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        #filename:focus { border-color: var(--accent); }
-
+        #filename { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 14px; padding: 6px 10px; border-radius: 6px; }
+        #filename:focus { border-color: var(--accent); outline: none; }
+        
         .icon-btn {
             width: 36px;
             height: 36px;
@@ -98,10 +66,8 @@
             align-items: center;
             justify-content: center;
         }
-
         .icon-btn.secondary { background: transparent; border: 1px solid var(--border); }
 
-        /* Tabs */
         #tabs-container {
             background: var(--tab-bg);
             border-bottom: 1px solid var(--border);
@@ -110,7 +76,6 @@
             scrollbar-width: none;
             flex-shrink: 0;
         }
-
         #tabs-container::-webkit-scrollbar { display: none; }
 
         .tab {
@@ -124,37 +89,13 @@
             gap: 8px;
             white-space: nowrap;
             user-select: none;
-            max-width: 160px;
         }
-
-        .tab.active {
-            background: var(--tab-active);
-            border-bottom: 2px solid var(--accent);
-            font-weight: 600;
-        }
-
-        .tab-close {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            font-size: 15px;
-        }
-
+        .tab.active { background: var(--tab-active); border-bottom: 2px solid var(--accent); font-weight: 600; }
+        .tab-close { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 15px; }
         .tab-close:active { background: #ff3b30; color: white; }
+        
+        #new-tab-btn { padding: 10px 16px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
 
-        #new-tab-btn {
-            padding: 10px 16px;
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        /* Editor Area */
         #editor-wrapper {
             flex: 1;
             display: flex;
@@ -167,7 +108,7 @@
             background: var(--bg);
             border-right: 1px solid var(--border);
             padding: 10px 4px;
-            font-family: var(--editor-font);
+            font-family: monospace;
             font-size: var(--font-size);
             line-height: 1.5;
             color: var(--text-muted);
@@ -181,7 +122,7 @@
             flex: 1;
             border: none;
             padding: 10px;
-            font-family: var(--editor-font);
+            font-family: monospace;
             font-size: var(--font-size);
             line-height: 1.5;
             background: var(--bg);
@@ -194,10 +135,8 @@
             white-space: pre;
             overflow: auto;
         }
-
         textarea::selection { background: rgba(0,122,204,0.4); }
 
-        /* Bottom Toolbar */
         #toolbar {
             position: fixed;
             bottom: 0;
@@ -213,7 +152,6 @@
             padding-bottom: env(safe-area-inset-bottom);
             z-index: 100;
         }
-
         #toolbar::-webkit-scrollbar { display: none; }
 
         .tool-btn {
@@ -228,10 +166,8 @@
             cursor: pointer;
             white-space: nowrap;
         }
-
         .tool-btn:active { background: var(--accent); }
 
-        /* Floating Nav Buttons */
         #float-nav {
             position: fixed;
             right: 12px;
@@ -241,7 +177,6 @@
             gap: 8px;
             z-index: 90;
         }
-
         .nav-btn {
             width: 40px;
             height: 40px;
@@ -257,20 +192,12 @@
             align-items: center;
             justify-content: center;
         }
-
         .nav-btn:active { opacity: 1; transform: scale(0.95); }
 
         /* Menu */
-        #menu-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 200;
-        }
-
+        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 200; }
         #menu-overlay.show { display: block; }
-
+        
         #menu {
             position: fixed;
             top: calc(env(safe-area-inset-top) + 50px);
@@ -286,9 +213,8 @@
             z-index: 201;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
         #menu.show { display: flex; }
-
+        
         .menu-item {
             padding: 14px 16px;
             font-size: 15px;
@@ -300,29 +226,19 @@
             cursor: pointer;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             width: 100%;
         }
-
         .menu-item:last-child { border-bottom: none; }
         .menu-item:active { background: var(--accent); }
         .menu-item.red { color: #ff6b6b; }
         .menu-item.red:active { background: #ff6b6b; color: white; }
+        .key-hint { font-size: 12px; color: var(--text-muted); margin-left: auto; padding-left: 20px; }
 
-        .key-hint { font-size: 12px; color: var(--text-muted); margin-left: 12px; }
-
-        /* Search Modal */
-        #search-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            z-index: 300;
-        }
-
+        /* Search - KOMPAKT ve ORTADA */
+        #search-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 300; }
         #search-overlay.show { display: block; }
-
-        #search-modal {
+        
+        #search-box {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -330,75 +246,49 @@
             background: #2d2d2d;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
-            width: 90%;
-            max-width: 360px;
+            padding: 16px;
+            width: 85%;
+            max-width: 320px;
             display: none;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             z-index: 301;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
-
-        #search-modal.show { display: flex; }
-
+        #search-box.show { display: flex; }
+        
         .search-input {
             width: 100%;
-            padding: 12px;
+            padding: 10px 12px;
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 8px;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
         }
-
-        .search-row { display: flex; gap: 8px; }
-
+        .search-row { display: flex; gap: 8px; margin-top: 4px; }
         .search-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px 8px;
             background: #3c3c3c;
             border: 1px solid #505050;
             color: white;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
-
         .search-btn.primary { background: var(--accent); }
 
-        /* Preview Modal */
-        #preview-modal {
-            position: fixed;
-            inset: 0;
-            background: white;
-            display: none;
-            flex-direction: column;
-            z-index: 400;
-        }
-
+        /* Preview */
+        #preview-modal { position: fixed; inset: 0; background: white; display: none; flex-direction: column; z-index: 400; }
         #preview-modal.show { display: flex; }
-
-        #preview-header {
-            height: 50px;
-            background: var(--header);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            padding-top: env(safe-area-inset-top);
-        }
-
-        #preview-frame {
-            flex: 1;
-            border: none;
-            background: white;
-        }
+        #preview-header { height: 50px; background: var(--header); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; padding-top: env(safe-area-inset-top); }
+        #preview-frame { flex: 1; border: none; background: white; }
 
         input[type="file"] { display: none; }
     </style>
 </head>
-<body class="dark">
+<body>
     <div id="app">
         <div id="header">
             <input type="text" id="filename" value="new.txt">
@@ -416,7 +306,6 @@
         </div>
     </div>
 
-    <!-- Toolbar -->
     <div id="toolbar">
         <button class="tool-btn" data-char="\t">Tab</button>
         <button class="tool-btn" data-char="<">&lt;</button>
@@ -432,7 +321,6 @@
         <button class="tool-btn" data-char="'">'</button>
     </div>
 
-    <!-- Floating Nav -->
     <div id="float-nav">
         <button class="nav-btn" data-nav="top">⤒</button>
         <button class="nav-btn" data-nav="up">↑</button>
@@ -440,7 +328,6 @@
         <button class="nav-btn" data-nav="bottom">⤓</button>
     </div>
 
-    <!-- Menu -->
     <div id="menu-overlay"></div>
     <div id="menu">
         <button class="menu-item" data-action="open">Aç...<span class="key-hint">Ctrl+O</span></button>
@@ -459,15 +346,14 @@
         <button class="menu-item red" data-action="clear">Tümünü Sil</button>
     </div>
 
-    <!-- Search -->
     <div id="search-overlay"></div>
-    <div id="search-modal">
+    <div id="search-box">
         <input type="text" class="search-input" id="find-text" placeholder="Ara...">
         <input type="text" class="search-input" id="replace-text" placeholder="Değiştir...">
         <div class="search-row">
             <button class="search-btn" id="close-search">Kapat</button>
-            <button class="search-btn" id="find-prev">Önceki</button>
-            <button class="search-btn primary" id="find-next">Sonraki</button>
+            <button class="search-btn" id="find-prev">← Önceki</button>
+            <button class="search-btn primary" id="find-next">Sonraki →</button>
         </div>
         <div class="search-row">
             <button class="search-btn" id="replace-one">Değiştir</button>
@@ -475,7 +361,6 @@
         </div>
     </div>
 
-    <!-- Preview -->
     <div id="preview-modal">
         <div id="preview-header">
             <b>Önizleme</b>
@@ -488,25 +373,13 @@
     <input type="file" id="zip-input" accept=".zip">
 
     <script>
-        // Service Worker Registration
-        const swCode = `
-            const CACHE_NAME = 'procode-v1';
-            const urlsToCache = ['./', './index.html'];
-            self.addEventListener('install', e => {
-                e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
-                self.skipWaiting();
-            });
-            self.addEventListener('fetch', e => {
-                e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-            });
-        `;
-        
+        // Service Worker Kaydı (Dosya olarak)
         if('serviceWorker' in navigator) {
-            const blob = new Blob([swCode], {type: 'application/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob));
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW error:', err));
         }
 
-        // App State
         const App = {
             tabs: [],
             activeTab: null,
@@ -514,24 +387,23 @@
             history: new Map(),
             zipFile: null,
             fontSizes: [12, 14, 16, 18, 20],
-            currentFontIndex: 1,
+            fontIndex: 1,
 
             init() {
-                this.cacheDOM();
+                this.cacheElements();
                 this.bindEvents();
                 this.newTab();
             },
 
-            cacheDOM() {
-                this.dom = {
+            cacheElements() {
+                this.el = {
                     editor: document.getElementById('editor'),
                     filename: document.getElementById('filename'),
                     tabsContainer: document.getElementById('tabs-container'),
-                    newTabBtn: document.getElementById('new-tab-btn'),
                     lineNumbers: document.getElementById('line-numbers'),
                     menu: document.getElementById('menu'),
                     menuOverlay: document.getElementById('menu-overlay'),
-                    searchModal: document.getElementById('search-modal'),
+                    searchBox: document.getElementById('search-box'),
                     searchOverlay: document.getElementById('search-overlay'),
                     previewModal: document.getElementById('preview-modal'),
                     previewFrame: document.getElementById('preview-frame'),
@@ -543,24 +415,32 @@
             },
 
             bindEvents() {
-                // Tab events
-                this.dom.newTabBtn.addEventListener('click', () => this.newTab());
+                document.getElementById('new-tab-btn').addEventListener('click', () => this.newTab());
+                document.getElementById('menu-btn').addEventListener('click', () => this.toggleMenu());
+                document.getElementById('preview-btn').addEventListener('click', () => this.togglePreview());
+                document.getElementById('close-preview').addEventListener('click', () => this.togglePreview());
+                this.el.menuOverlay.addEventListener('click', () => this.toggleMenu());
                 
-                this.dom.filename.addEventListener('change', (e) => {
+                this.el.filename.addEventListener('change', (e) => {
+                    const tab = this.getActiveTab();
+                    if(tab) { tab.name = e.target.value; this.renderTabs(); }
+                });
+
+                this.el.editor.addEventListener('input', () => {
+                    this.updateLineNumbers();
                     const tab = this.getActiveTab();
                     if(tab) {
-                        tab.name = e.target.value;
-                        this.renderTabs();
+                        tab.content = this.el.editor.value;
+                        if(!tab.modified) { tab.modified = true; this.renderTabs(); }
                     }
+                    clearTimeout(this.historyTimer);
+                    this.historyTimer = setTimeout(() => this.saveHistory(), 400);
                 });
 
-                // Editor events
-                this.dom.editor.addEventListener('input', () => this.onEditorInput());
-                this.dom.editor.addEventListener('scroll', () => {
-                    this.dom.lineNumbers.scrollTop = this.dom.editor.scrollTop;
+                this.el.editor.addEventListener('scroll', () => {
+                    this.el.lineNumbers.scrollTop = this.el.editor.scrollTop;
                 });
 
-                // Toolbar
                 document.querySelectorAll('.tool-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const char = btn.dataset.char === '\\t' ? '\t' : btn.dataset.char;
@@ -568,46 +448,32 @@
                     });
                 });
 
-                // Floating nav
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
-                        this.scrollTo(btn.dataset.nav);
+                        this.navigate(btn.dataset.nav);
                     });
                 });
 
-                // Menu
-                document.getElementById('menu-btn').addEventListener('click', () => this.toggleMenu());
-                this.dom.menuOverlay.addEventListener('click', () => this.toggleMenu());
-                
-                this.dom.menu.addEventListener('click', (e) => {
+                this.el.menu.addEventListener('click', (e) => {
                     const item = e.target.closest('.menu-item');
-                    if(item) this.handleMenu(item.dataset.action);
+                    if(item) this.handleAction(item.dataset.action);
                 });
 
-                // Search
-                document.getElementById('preview-btn').addEventListener('click', () => this.togglePreview());
-                document.getElementById('close-preview').addEventListener('click', () => this.togglePreview());
-                
                 document.getElementById('close-search').addEventListener('click', () => this.closeSearch());
                 document.getElementById('find-next').addEventListener('click', () => this.findNext());
                 document.getElementById('find-prev').addEventListener('click', () => this.findPrev());
                 document.getElementById('replace-one').addEventListener('click', () => this.replaceOne());
                 document.getElementById('replace-all').addEventListener('click', () => this.replaceAll());
 
-                // File inputs
-                this.dom.fileInput.addEventListener('change', (e) => this.handleFile(e.target.files[0]));
-                this.dom.zipInput.addEventListener('change', (e) => this.handleZip(e.target.files[0]));
+                this.el.fileInput.addEventListener('change', (e) => this.handleFile(e.target.files[0]));
+                this.el.zipInput.addEventListener('change', (e) => this.handleZip(e.target.files[0]));
 
-                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
-                    if(e.key === 'Tab') {
-                        e.preventDefault();
-                        this.insertText('    ');
-                    }
+                    if(e.key === 'Tab') { e.preventDefault(); this.insertText('    '); }
                     if(e.ctrlKey || e.metaKey) {
                         if(e.key === 's') { e.preventDefault(); this.saveFile(); }
-                        if(e.key === 'o') { e.preventDefault(); this.openFile(); }
+                        if(e.key === 'o') { e.preventDefault(); this.el.fileInput.click(); }
                         if(e.key === 'f') { e.preventDefault(); this.openSearch(); }
                         if(e.key === 'z') { e.preventDefault(); this.undo(); }
                         if(e.key === 'y') { e.preventDefault(); this.redo(); }
@@ -615,7 +481,7 @@
                 });
             },
 
-            newTab(name = 'new.txt', content = '') {
+            newTab(name='new.txt', content='') {
                 this.counter++;
                 const id = this.counter;
                 this.tabs.push({id, name, content, modified: false});
@@ -625,12 +491,11 @@
 
             switchTab(id) {
                 const current = this.getActiveTab();
-                if(current) current.content = this.dom.editor.value;
-                
+                if(current) current.content = this.el.editor.value;
                 this.activeTab = id;
                 const tab = this.tabs.find(t => t.id === id);
-                this.dom.editor.value = tab.content;
-                this.dom.filename.value = tab.name;
+                this.el.editor.value = tab.content;
+                this.el.filename.value = tab.name;
                 this.updateLineNumbers();
                 this.renderTabs();
             },
@@ -639,24 +504,18 @@
                 if(this.tabs.length <= 1) return;
                 this.tabs = this.tabs.filter(t => t.id !== id);
                 this.history.delete(id);
-                if(this.activeTab === id) {
-                    this.switchTab(this.tabs[this.tabs.length - 1].id);
-                } else {
-                    this.renderTabs();
-                }
+                if(this.activeTab === id) this.switchTab(this.tabs[this.tabs.length-1].id);
+                else this.renderTabs();
             },
 
             renderTabs() {
-                // Clear existing tabs except new tab button
-                const existing = this.dom.tabsContainer.querySelectorAll('.tab');
+                const existing = this.el.tabsContainer.querySelectorAll('.tab');
                 existing.forEach(t => t.remove());
-
-                // Render tabs
+                
                 this.tabs.forEach(tab => {
                     const div = document.createElement('div');
                     div.className = 'tab' + (tab.id === this.activeTab ? ' active' : '');
                     div.innerHTML = `<span>${tab.name}${tab.modified ? ' •' : ''}</span><span class="tab-close" data-id="${tab.id}">×</span>`;
-                    
                     div.addEventListener('click', (e) => {
                         if(e.target.classList.contains('tab-close')) {
                             e.stopPropagation();
@@ -665,63 +524,31 @@
                             this.switchTab(tab.id);
                         }
                     });
-                    
-                    this.dom.tabsContainer.insertBefore(div, this.dom.newTabBtn);
+                    this.el.tabsContainer.insertBefore(div, document.getElementById('new-tab-btn'));
                 });
             },
 
-            getActiveTab() {
-                return this.tabs.find(t => t.id === this.activeTab);
-            },
-
-            onEditorInput() {
-                this.updateLineNumbers();
-                const tab = this.getActiveTab();
-                if(tab) {
-                    tab.content = this.dom.editor.value;
-                    if(!tab.modified) {
-                        tab.modified = true;
-                        this.renderTabs();
-                    }
-                }
-                clearTimeout(this.historyTimer);
-                this.historyTimer = setTimeout(() => this.saveHistory(), 500);
-            },
+            getActiveTab() { return this.tabs.find(t => t.id === this.activeTab); },
 
             updateLineNumbers() {
-                const lines = this.dom.editor.value.split('\n').length;
-                this.dom.lineNumbers.innerHTML = Array(lines).fill(0).map((_,i) => i+1).join('<br>');
+                const lines = this.el.editor.value.split('\n').length;
+                this.el.lineNumbers.innerHTML = Array(lines).fill(0).map((_,i) => i+1).join('<br>');
             },
 
             insertText(text) {
-                const ed = this.dom.editor;
-                const start = ed.selectionStart;
-                const end = ed.selectionEnd;
-                ed.setRangeText(text, start, end, 'end');
+                const ed = this.el.editor;
+                ed.setRangeText(text, ed.selectionStart, ed.selectionEnd, 'end');
                 ed.focus();
                 ed.dispatchEvent(new Event('input'));
             },
 
-            scrollTo(direction) {
-                const ed = this.dom.editor;
-                const lineHeight = 21;
-                
-                switch(direction) {
-                    case 'top':
-                        ed.scrollTop = 0;
-                        ed.setSelectionRange(0, 0);
-                        break;
-                    case 'bottom':
-                        ed.scrollTop = ed.scrollHeight;
-                        const len = ed.value.length;
-                        ed.setSelectionRange(len, len);
-                        break;
-                    case 'up':
-                        ed.scrollBy({top: -200, behavior: 'smooth'});
-                        break;
-                    case 'down':
-                        ed.scrollBy({top: 200, behavior: 'smooth'});
-                        break;
+            navigate(dir) {
+                const ed = this.el.editor;
+                switch(dir) {
+                    case 'top': ed.scrollTop = 0; ed.setSelectionRange(0,0); break;
+                    case 'bottom': ed.scrollTop = ed.scrollHeight; const len=ed.value.length; ed.setSelectionRange(len,len); break;
+                    case 'up': ed.scrollBy({top: -200, behavior: 'smooth'}); break;
+                    case 'down': ed.scrollBy({top: 200, behavior: 'smooth'}); break;
                 }
             },
 
@@ -729,10 +556,9 @@
                 const tab = this.getActiveTab();
                 if(!tab) return;
                 const h = this.history.get(tab.id);
-                if(h.stack[h.index] === this.dom.editor.value) return;
-                
-                if(h.index < h.stack.length - 1) h.stack = h.stack.slice(0, h.index + 1);
-                h.stack.push(this.dom.editor.value);
+                if(h.stack[h.index] === this.el.editor.value) return;
+                if(h.index < h.stack.length-1) h.stack = h.stack.slice(0, h.index+1);
+                h.stack.push(this.el.editor.value);
                 h.index++;
                 if(h.stack.length > 50) { h.stack.shift(); h.index--; }
             },
@@ -743,7 +569,7 @@
                 const h = this.history.get(tab.id);
                 if(h.index > 0) {
                     h.index--;
-                    this.dom.editor.value = h.stack[h.index];
+                    this.el.editor.value = h.stack[h.index];
                     tab.content = h.stack[h.index];
                     this.updateLineNumbers();
                 }
@@ -753,42 +579,37 @@
                 const tab = this.getActiveTab();
                 if(!tab) return;
                 const h = this.history.get(tab.id);
-                if(h.index < h.stack.length - 1) {
+                if(h.index < h.stack.length-1) {
                     h.index++;
-                    this.dom.editor.value = h.stack[h.index];
+                    this.el.editor.value = h.stack[h.index];
                     tab.content = h.stack[h.index];
                     this.updateLineNumbers();
                 }
             },
 
             toggleMenu() {
-                const show = !this.dom.menu.classList.contains('show');
-                this.dom.menu.classList.toggle('show', show);
-                this.dom.menuOverlay.classList.toggle('show', show);
+                const show = !this.el.menu.classList.contains('show');
+                this.el.menu.classList.toggle('show', show);
+                this.el.menuOverlay.classList.toggle('show', show);
             },
 
-            handleMenu(action) {
+            handleAction(action) {
                 this.toggleMenu();
                 switch(action) {
-                    case 'open': this.dom.fileInput.click(); break;
-                    case 'openZip': this.dom.zipInput.click(); break;
+                    case 'open': this.el.fileInput.click(); break;
+                    case 'openZip': this.el.zipInput.click(); break;
                     case 'save': this.saveFile(); break;
-                    case 'saveZip': this.saveAsZip(); break;
+                    case 'saveZip': this.saveZip(); break;
                     case 'undo': this.undo(); break;
                     case 'redo': this.redo(); break;
                     case 'search': this.openSearch(); break;
                     case 'fontSize': this.changeFont(); break;
                     case 'theme': this.toggleTheme(); break;
-                    case 'selectAll': this.dom.editor.select(); this.dom.editor.focus(); break;
+                    case 'selectAll': this.el.editor.select(); this.el.editor.focus(); break;
                     case 'copy': this.copy(); break;
                     case 'cut': this.cut(); break;
                     case 'paste': this.paste(); break;
-                    case 'clear': 
-                        if(confirm('Tüm içerik silinsin mi?')) {
-                            this.dom.editor.value = '';
-                            this.dom.editor.dispatchEvent(new Event('input'));
-                        }
-                        break;
+                    case 'clear': if(confirm('Tüm içerik silinsin mi?')) { this.el.editor.value=''; this.el.editor.dispatchEvent(new Event('input')); } break;
                 }
             },
 
@@ -797,7 +618,7 @@
                 const reader = new FileReader();
                 reader.onload = (e) => this.newTab(file.name, e.target.result);
                 reader.readAsText(file);
-                this.dom.fileInput.value = '';
+                this.el.fileInput.value = '';
             },
 
             async handleZip(file) {
@@ -811,13 +632,13 @@
                         this.newTab(files[0], content);
                     }
                 } catch(e) { alert('ZIP hatası'); }
-                this.dom.zipInput.value = '';
+                this.el.zipInput.value = '';
             },
 
             saveFile() {
                 const tab = this.getActiveTab();
                 if(!tab) return;
-                const blob = new Blob([this.dom.editor.value], {type: 'text/plain'});
+                const blob = new Blob([this.el.editor.value], {type: 'text/plain'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -828,87 +649,90 @@
                 this.renderTabs();
             },
 
-            async saveAsZip() {
+            async saveZip() {
                 const tab = this.getActiveTab();
                 if(!tab) return;
                 const zip = new JSZip();
-                zip.file(tab.name, this.dom.editor.value);
+                zip.file(tab.name, this.el.editor.value);
                 const blob = await zip.generateAsync({type: 'blob'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = tab.name + '.zip';
+                a.download = tab.name.replace(/\.[^/.]+$/, '') + '.zip';
                 a.click();
                 URL.revokeObjectURL(url);
             },
 
             openSearch() {
-                this.dom.searchModal.classList.add('show');
-                this.dom.searchOverlay.classList.add('show');
-                this.dom.findText.focus();
+                this.el.searchBox.classList.add('show');
+                this.el.searchOverlay.classList.add('show');
+                this.el.findText.focus();
             },
 
             closeSearch() {
-                this.dom.searchModal.classList.remove('show');
-                this.dom.searchOverlay.classList.remove('show');
+                this.el.searchBox.classList.remove('show');
+                this.el.searchOverlay.classList.remove('show');
             },
 
             findNext() {
-                const text = this.dom.findText.value;
+                const text = this.el.findText.value;
                 if(!text) return;
-                const content = this.dom.editor.value;
-                let idx = content.indexOf(text, this.dom.editor.selectionEnd);
+                const ed = this.el.editor;
+                const content = ed.value;
+                let idx = content.indexOf(text, ed.selectionEnd);
                 if(idx === -1) idx = content.indexOf(text);
                 if(idx === -1) return;
-                this.dom.editor.setSelectionRange(idx, idx + text.length);
-                this.dom.editor.focus();
+                ed.setSelectionRange(idx, idx + text.length);
+                ed.focus();
+                ed.scrollTop = (content.substring(0, idx).split('\n').length - 1) * 21 - 100;
             },
 
             findPrev() {
-                const text = this.dom.findText.value;
+                const text = this.el.findText.value;
                 if(!text) return;
-                const content = this.dom.editor.value;
-                let idx = content.lastIndexOf(text, this.dom.editor.selectionStart - 1);
+                const ed = this.el.editor;
+                const content = ed.value;
+                let idx = content.lastIndexOf(text, ed.selectionStart - 1);
                 if(idx === -1) idx = content.lastIndexOf(text);
                 if(idx === -1) return;
-                this.dom.editor.setSelectionRange(idx, idx + text.length);
-                this.dom.editor.focus();
+                ed.setSelectionRange(idx, idx + text.length);
+                ed.focus();
             },
 
             replaceOne() {
-                const find = this.dom.findText.value;
-                const replace = this.dom.replaceText.value;
-                const sel = this.dom.editor.value.substring(this.dom.editor.selectionStart, this.dom.editor.selectionEnd);
+                const find = this.el.findText.value;
+                const replace = this.el.replaceText.value;
+                const ed = this.el.editor;
+                const sel = ed.value.substring(ed.selectionStart, ed.selectionEnd);
                 if(sel === find) this.insertText(replace);
                 this.findNext();
             },
 
             replaceAll() {
-                const find = this.dom.findText.value;
-                const replace = this.dom.replaceText.value;
-                this.dom.editor.value = this.dom.editor.value.split(find).join(replace);
-                this.dom.editor.dispatchEvent(new Event('input'));
+                const find = this.el.findText.value;
+                const replace = this.el.replaceText.value;
+                this.el.editor.value = this.el.editor.value.split(find).join(replace);
+                this.el.editor.dispatchEvent(new Event('input'));
             },
 
             togglePreview() {
-                if(!this.dom.previewModal.classList.contains('show')) {
-                    const name = this.dom.filename.value;
-                    const content = this.dom.editor.value;
+                if(!this.el.previewModal.classList.contains('show')) {
+                    const name = this.el.filename.value;
+                    const content = this.el.editor.value;
                     if(name.match(/\.html?$/i)) {
-                        this.dom.previewFrame.srcdoc = content;
+                        this.el.previewFrame.srcdoc = content;
                     } else {
-                        this.dom.previewFrame.srcdoc = `<pre style="padding:20px;font-family:monospace">${content.replace(/</g,'&lt;')}</pre>`;
+                        this.el.previewFrame.srcdoc = `<pre style="padding:20px;font-family:monospace;white-space:pre-wrap">${content.replace(/</g, '&lt;')}</pre>`;
                     }
-                    this.dom.previewModal.classList.add('show');
+                    this.el.previewModal.classList.add('show');
                 } else {
-                    this.dom.previewModal.classList.remove('show');
+                    this.el.previewModal.classList.remove('show');
                 }
             },
 
             changeFont() {
-                this.currentFontIndex = (this.currentFontIndex + 1) % this.fontSizes.length;
-                const size = this.fontSizes[this.currentFontIndex];
-                document.documentElement.style.setProperty('--font-size', size + 'px');
+                this.fontIndex = (this.fontIndex + 1) % this.fontSizes.length;
+                document.documentElement.style.setProperty('--font-size', this.fontSizes[this.fontIndex] + 'px');
             },
 
             toggleTheme() {
@@ -916,12 +740,12 @@
             },
 
             async copy() {
-                const text = this.dom.editor.value.substring(this.dom.editor.selectionStart, this.dom.editor.selectionEnd);
+                const text = this.el.editor.value.substring(this.el.editor.selectionStart, this.el.editor.selectionEnd);
                 if(text) await navigator.clipboard.writeText(text);
             },
 
             async cut() {
-                const ed = this.dom.editor;
+                const ed = this.el.editor;
                 const text = ed.value.substring(ed.selectionStart, ed.selectionEnd);
                 if(text) {
                     await navigator.clipboard.writeText(text);
@@ -931,14 +755,13 @@
             },
 
             async paste() {
-                const text = await navigator.clipboard.readText();
-                this.insertText(text);
+                try {
+                    const text = await navigator.clipboard.readText();
+                    this.insertText(text);
+                } catch(e) {}
             }
         };
-                // Initialize PWA Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+
         App.init();
     </script>
 </body>
