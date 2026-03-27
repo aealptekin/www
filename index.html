@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>AlpEditör Pro</title>
+    <title>AlpEditör</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <style>
@@ -21,37 +21,23 @@
             --ios-text: #d4d4d4; --ios-menu-bg: rgba(40, 40, 40, 0.95); --ios-tab-bg: #252526;
             --ios-tab-active: #1e1e1e; --ios-line-num: #858585; --ios-line-bg: #1e1e1e;
         }
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; background-color: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; background-color: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s; }
         header { background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; padding-top: max(15px, env(safe-area-inset-top)); position: relative; z-index: 100; }
-        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+        .file-name { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
         .btn-icon { color: var(--ios-blue); background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
-
-        .dropdown-menu, .popup-window, .ios-context-menu { 
-            position: absolute; background-color: var(--ios-menu-bg); border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
-            display: none; flex-direction: column; overflow: hidden; border: 1px solid var(--ios-border); z-index: 500; 
-        }
+        .dropdown-menu, .popup-window, .ios-context-menu { position: absolute; background-color: var(--ios-menu-bg); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; flex-direction: column; overflow: hidden; border: 1px solid var(--ios-border); z-index: 500; }
         .dropdown-menu.active, .popup-window.active, .ios-context-menu.active { display: flex; }
-        
-        .dropdown-menu button, .ios-context-menu button { 
-            background: transparent; border: none; border-bottom: 1px solid var(--ios-border); 
-            padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; width: 180px; cursor: pointer; 
-        }
+        .dropdown-menu button, .ios-context-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; width: 180px; cursor: pointer; }
         .dropdown-menu button.action-btn { color: var(--ios-text); }
         .dropdown-menu button:last-child, .ios-context-menu button:last-child { border-bottom: none; }
-        
         .tabs-container { display: flex; background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
         .tab { padding: 10px 15px; font-size: 14px; color: var(--ios-text); background-color: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         .tab.active { background-color: var(--ios-tab-active); font-weight: 600; border-bottom: 2px solid var(--ios-blue); }
-        .tab-close { color: var(--ios-line-num); font-weight: bold; padding: 2px; }
-
         .editor-wrapper { display: flex; flex: 1; overflow: hidden; background-color: var(--ios-bg); }
         .line-numbers { width: 45px; padding: 15px 5px; font-family: var(--editor-font-family); font-size: var(--editor-font-size); line-height: 1.6; color: var(--ios-line-num); text-align: right; background-color: var(--ios-line-bg); overflow: hidden; user-select: none; opacity: 0.6; }
-        textarea { flex: 1; border: none; padding: 15px 10px; font-size: var(--editor-font-size); line-height: 1.6; font-family: var(--editor-font-family); background-color: transparent; color: var(--ios-text); resize: none; outline: none; box-sizing: border-box; overflow-y: auto; white-space: pre; }
-        
+        textarea { flex: 1; border: none; padding: 15px 10px; font-size: var(--editor-font-size); line-height: 1.6; font-family: var(--editor-font-family); background-color: transparent; color: var(--ios-text); resize: none; outline: none; -webkit-appearance: none; overflow-y: auto; white-space: pre; }
         .toolbar { display: flex; background: var(--ios-header); border-top: 1px solid var(--ios-border); overflow-x: auto; padding: 8px; gap: 6px; }
         .toolbar button { background: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 8px; padding: 10px; min-width: 44px; font-family: monospace; }
-        
         #previewOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; flex-direction: column; }
         .ios-context-menu { flex-direction: row; width: auto; position: absolute; }
         .ios-context-menu .divider { width: 1px; background-color: var(--ios-border); margin: 5px 0; }
@@ -80,292 +66,52 @@
         <button class="action-btn" onclick="handleAction('delete')" style="color:red">Sil</button>
     </div>
 </header>
-
 <div class="tabs-container"><div id="tabsList" style="display:flex;"></div><button class="btn-icon" id="btnAddTab" style="font-size:20px; padding:0 15px">+</button></div>
-
-<div class="editor-wrapper">
-    <div class="line-numbers" id="lineNumbers">1</div>
-    <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="none" wrap="off"></textarea>
-</div>
-
-<div class="toolbar" id="toolbar">
-    <button onclick="insertTxt('\t')">TAB</button>
-    <button onclick="insertTxt('<')">&lt;</button>
-    <button onclick="insertTxt('>')">&gt;</button>
-    <button onclick="insertTxt('/')">/</button>
-    <button onclick="insertTxt('{')">{</button>
-    <button onclick="insertTxt('}')">}</button>
-    <button onclick="insertTxt(';')">;</button>
-    <button onclick="insertTxt('=')">=</button>
-</div>
-
+<div class="editor-wrapper"><div class="line-numbers" id="lineNumbers">1</div><textarea id="editor" spellcheck="false" autocomplete="off" wrap="off"></textarea></div>
+<div class="toolbar"><button onclick="insertTxt('\t')">TAB</button><button onclick="insertTxt('<')">&lt;</button><button onclick="insertTxt('>')">&gt;</button><button onclick="insertTxt('/')">/</button><button onclick="insertTxt('{')">{</button><button onclick="insertTxt('}')">}</button><button onclick="insertTxt(';')">;</button><button onclick="insertTxt('=')">=</button></div>
 <div class="popup-window" id="searchPopup" style="top:80px; left:50%; transform:translateX(-50%); padding:15px; gap:10px; align-items:center;">
     <input type="text" id="searchInput" placeholder="Kelime ara..." style="padding:8px; border-radius:6px; border:1px solid var(--ios-border); background:var(--ios-bg); color:var(--ios-text); width:180px;">
-    <div style="display:flex; gap:10px;">
-        <button id="btnSearchNext" style="color:var(--ios-blue); background:none; border:none; font-weight:bold">Bul</button>
-        <button id="btnSearchClose" style="color:red; background:none; border:none">Kapat</button>
-    </div>
+    <div style="display:flex; gap:10px;"><button id="btnSearchNext" style="color:var(--ios-blue); background:none; border:none; font-weight:bold">Bul</button><button id="btnSearchClose" style="color:red; background:none; border:none">Kapat</button></div>
 </div>
-
 <div class="popup-window" id="fontSizePopup" style="top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; gap:15px; align-items:center;">
-    <div style="display:flex; gap:15px; align-items:center;">
-        <button id="btnFontDec" style="width:40px; height:40px; background:var(--ios-tab-bg); border:1px solid var(--ios-border); border-radius:6px;">-</button>
-        <span id="fontSizeDisplay" style="font-weight:bold">14px</span>
-        <button id="btnFontInc" style="width:40px; height:40px; background:var(--ios-tab-bg); border:1px solid var(--ios-border); border-radius:6px;">+</button>
-    </div>
+    <div style="display:flex; gap:15px; align-items:center;"><button id="btnFontDec" style="width:40px; height:40px">-</button><span id="fontSizeDisplay" style="font-weight:bold">14px</span><button id="btnFontInc" style="width:40px; height:40px">+</button></div>
     <button id="btnFontClose" style="color:red; background:none; border:none">Kapat</button>
 </div>
-
-<div id="iosContextMenu" class="ios-context-menu">
-    <button onclick="handleAction('search')">Ara</button>
-    <div class="divider"></div>
-    <button onclick="handleAction('selectAll')">Tümünü Seç</button>
-    <div class="divider"></div>
-    <button onclick="handleAction('cut')">Kes</button>
-    <div class="divider"></div>
-    <button onclick="handleAction('copy')">Kopya</button>
-    <div class="divider"></div>
-    <button onclick="handleAction('paste')">Yapıştır</button>
-    <div class="divider"></div>
-    <button onclick="handleAction('delete')" style="color:red">Sil</button>
-</div>
-
-<div id="previewOverlay">
-    <div style="background:#f8f8f8; padding:12px; display:flex; justify-content:space-between; border-bottom:1px solid #ddd; align-items:center;"><b style="color:black">Canlı Önizleme</b><button id="btnClosePreview" style="background:red; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:bold;">Kapat</button></div>
-    <iframe id="previewFrame" style="flex:1; width:100%; border:none;"></iframe>
-</div>
-
+<div id="iosContextMenu" class="ios-context-menu"><button onclick="handleAction('search')">Ara</button><div class="divider"></div><button onclick="handleAction('selectAll')">Tümünü Seç</button><div class="divider"></div><button onclick="handleAction('cut')">Kes</button><div class="divider"></div><button onclick="handleAction('copy')">Kopya</button><div class="divider"></div><button onclick="handleAction('paste')">Yapıştır</button><div class="divider"></div><button onclick="handleAction('delete')" style="color:red">Sil</button></div>
+<div id="previewOverlay"><div style="background:#f8f8f8; padding:12px; display:flex; justify-content:space-between; border-bottom:1px solid #ddd; align-items:center;"><b style="color:black">Canlı Önizleme</b><button id="btnClosePreview" style="background:red; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:bold;">Kapat</button></div><iframe id="previewFrame" style="flex:1; width:100%; border:none;"></iframe></div>
 <input type="file" id="fileInput" style="display:none;" accept=".html,.txt,.css,.js,.json,.md">
-
 <script>
-    const editor = document.getElementById('editor');
-    const lineNumbers = document.getElementById('lineNumbers');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const fileInput = document.getElementById('fileInput');
-    const mainMenu = document.getElementById('mainMenu');
-    const ctxMenu = document.getElementById('iosContextMenu');
-    
-    let tabs = [];
-    let activeTabId = null;
-    let tabCounter = 0;
-    let isProg = false;
-    let lastSearchIdx = 0;
-
-    // --- MIME VE DOSYA YÖNETİMİ ---
-    const getMime = (n) => {
-        const ext = n.split('.').pop().toLowerCase();
-        const m = {'html':'text/html','js':'text/javascript','css':'text/css','json':'application/json','txt':'text/plain','md':'text/markdown'};
-        return m[ext] || 'application/octet-stream';
-    };
-
-    const updateLines = () => {
-        const l = editor.value.split('\n').length;
-        lineNumbers.innerHTML = Array.from({length:l}, (_,i)=>i+1).join('<br>');
-    };
-
-    const saveFile = (asNew) => {
-        const active = tabs.find(t=>t.id===activeTabId);
-        let name = active.name;
-        if(asNew || name === "İsimsiz.html") {
-            const n = prompt("Dosya adı:", name);
-            if(!n) return;
-            name = n; active.name = name; renderTabs();
-        }
-        const b = new Blob([editor.value], {type: getMime(name)});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(b);
-        a.download = name;
-        a.click();
-        mainMenu.classList.remove('active');
-    };
-
-    // --- SEKME YÖNETİMİ ---
-    const addTab = (n="İsimsiz.html", c="") => {
-        tabCounter++;
-        tabs.push({id:tabCounter, name:n, content:c, history:[c], historyIndex:0});
-        switchTab(tabCounter);
-    };
-
-    const switchTab = (id) => {
-        if(activeTabId) tabs.find(t=>t.id===activeTabId).content = editor.value;
-        activeTabId = id;
-        const a = tabs.find(t=>t.id===id);
-        isProg = true;
-        editor.value = a.content;
-        fileNameDisplay.textContent = a.name;
-        renderTabs();
-        updateLines();
-    };
-
-    const renderTabs = () => {
-        const l = document.getElementById('tabsList');
-        l.innerHTML = '';
-        tabs.forEach(t => {
-            const el = document.createElement('div');
-            el.className = `tab ${t.id===activeTabId?'active':''}`;
-            el.innerHTML = `<span>${t.name}</span><span class="tab-close" onclick="event.stopPropagation();closeTab(${t.id})">×</span>`;
-            el.onclick = () => switchTab(t.id);
-            l.appendChild(el);
-        });
-    };
-
-    const closeTab = (id) => {
-        if(tabs.length===1) return;
-        tabs = tabs.filter(t=>t.id!==id);
-        switchTab(tabs[0].id);
-    };
-
-    // --- CLIPBOARD VE AKSİYONLAR ---
-    async function handleAction(act) {
-        editor.focus();
-        const s = editor.selectionStart;
-        const e = editor.selectionEnd;
-        
-        switch(act) {
-            case 'selectAll': editor.select(); break;
-            case 'copy': 
-                if(s!==e) await navigator.clipboard.writeText(editor.value.substring(s,e));
-                break;
-            case 'cut':
-                if(s!==e) {
-                    await navigator.clipboard.writeText(editor.value.substring(s,e));
-                    editor.setRangeText('', s, e, 'end');
-                }
-                break;
-            case 'paste':
-                try {
-                    const t = await navigator.clipboard.readText();
-                    editor.setRangeText(t, s, e, 'end');
-                } catch(err) { alert("Pano izni gerekli."); }
-                break;
-            case 'delete':
-                editor.setRangeText('', s, e, 'end');
-                break;
-            case 'search':
-                document.getElementById('searchPopup').classList.add('active');
-                break;
-        }
-        updateLines();
-        mainMenu.classList.remove('active');
-        ctxMenu.classList.remove('active');
-    }
-
-    const insertTxt = (t) => {
-        editor.setRangeText(t, editor.selectionStart, editor.selectionEnd, 'end');
-        editor.focus();
-        updateLines();
-    };
-
-    // --- ETKİLEŞİM VE POPUPLAR ---
-    editor.oninput = () => {
-        updateLines();
-        const a = tabs.find(t=>t.id===activeTabId);
-        if(!isProg){
-            if(a.historyIndex < a.history.length-1) a.history = a.history.slice(0, a.historyIndex+1);
-            a.history.push(editor.value);
-            a.historyIndex++;
-        }
-        isProg = false;
-    };
-
-    editor.onscroll = () => {
-        lineNumbers.scrollTop = editor.scrollTop;
-        ctxMenu.classList.remove('active');
-    };
-
-    editor.oncontextmenu = (e) => {
-        e.preventDefault();
-        ctxMenu.style.display = 'flex';
-        ctxMenu.style.left = Math.min(e.pageX, window.innerWidth - 250) + 'px';
-        ctxMenu.style.top = (e.pageY - 50) + 'px';
-        ctxMenu.classList.add('active');
-    };
-
-    document.getElementById('btnSearchNext').onclick = () => {
-        const t = editor.value.toLowerCase();
-        const w = document.getElementById('searchInput').value.toLowerCase();
-        if(!w) return;
-        const idx = t.indexOf(w, lastSearchIdx);
-        if(idx !== -1) {
-            editor.setSelectionRange(idx, idx + w.length);
-            lastSearchIdx = idx + w.length;
-        } else {
-            lastSearchIdx = 0;
-            alert("Metin sonuna ulaşıldı.");
-        }
-    };
-
-    document.getElementById('btnSearchClose').onclick = () => document.getElementById('searchPopup').classList.remove('active');
-
+    const editor = document.getElementById('editor'), lineNumbers = document.getElementById('lineNumbers'), fileNameDisplay = document.getElementById('fileNameDisplay'), fileInput = document.getElementById('fileInput'), mainMenu = document.getElementById('mainMenu'), ctxMenu = document.getElementById('iosContextMenu');
+    let tabs = [], activeTabId = null, tabCounter = 0, isProg = false, lastSearchIdx = 0;
+    const getMime = (n) => { const ext = n.split('.').pop().toLowerCase(); const m = {'html':'text/html','js':'text/javascript','css':'text/css','json':'application/json','txt':'text/plain'}; return m[ext] || 'application/octet-stream'; };
+    const updateLines = () => { const l = editor.value.split('\n').length; lineNumbers.innerHTML = Array.from({length:l}, (_,i)=>i+1).join('<br>'); };
+    const saveFile = (asNew) => { const a = tabs.find(t=>t.id===activeTabId); let n = a.name; if(asNew || n === "İsimsiz.html") { const res = prompt("Dosya adı:", n); if(!res) return; n = res; a.name = n; renderTabs(); } const b = new Blob([editor.value], {type: getMime(n)}); const url = URL.createObjectURL(b); const link = document.createElement("a"); link.href = url; link.download = n; link.click(); };
+    const addTab = (n="İsimsiz.html", c="") => { tabCounter++; tabs.push({id:tabCounter, name:n, content:c, history:[c], historyIndex:0}); switchTab(tabCounter); };
+    const switchTab = (id) => { if(activeTabId) tabs.find(t=>t.id===activeTabId).content = editor.value; activeTabId = id; const a = tabs.find(t=>t.id===id); isProg = true; editor.value = a.content; fileNameDisplay.textContent = a.name; renderTabs(); updateLines(); };
+    const renderTabs = () => { const l = document.getElementById('tabsList'); l.innerHTML = ''; tabs.forEach(t => { const el = document.createElement('div'); el.className = `tab ${t.id===activeTabId?'active':''}`; el.innerHTML = `<span>${t.name}</span><span onclick="event.stopPropagation();closeTab(${t.id})">×</span>`; el.onclick = () => switchTab(t.id); l.appendChild(el); }); };
+    const closeTab = (id) => { if(tabs.length===1) return; tabs = tabs.filter(t=>t.id!==id); switchTab(tabs[0].id); };
+    async function handleAction(act) { editor.focus(); const s = editor.selectionStart, e = editor.selectionEnd; if(act==='selectAll') editor.select(); else if(act==='copy') { if(s!==e) await navigator.clipboard.writeText(editor.value.substring(s,e)); } else if(act==='cut') { if(s!==e) { await navigator.clipboard.writeText(editor.value.substring(s,e)); editor.setRangeText('', s, e, 'end'); } } else if(act==='paste') { try { const t = await navigator.clipboard.readText(); editor.setRangeText(t, s, e, 'end'); } catch(err){alert("İzin gerekli");} } else if(act==='delete') editor.setRangeText('', s, e, 'end'); else if(act==='search') document.getElementById('searchPopup').classList.add('active'); updateLines(); mainMenu.classList.remove('active'); ctxMenu.classList.remove('active'); }
+    const insertTxt = (t) => { editor.setRangeText(t, editor.selectionStart, editor.selectionEnd, 'end'); editor.focus(); updateLines(); };
+    editor.oninput = () => { updateLines(); const a = tabs.find(t=>t.id===activeTabId); if(!isProg){ if(a.historyIndex < a.history.length-1) a.history = a.history.slice(0, a.historyIndex+1); a.history.push(editor.value); a.historyIndex++; } isProg = false; };
+    editor.onscroll = () => { lineNumbers.scrollTop = editor.scrollTop; ctxMenu.classList.remove('active'); };
+    editor.oncontextmenu = (e) => { e.preventDefault(); ctxMenu.style.display = 'flex'; ctxMenu.style.left = Math.min(e.pageX, window.innerWidth - 350) + 'px'; ctxMenu.style.top = (e.pageY - 50) + 'px'; ctxMenu.classList.add('active'); };
+    document.getElementById('btnSearchNext').onclick = () => { const t = editor.value.toLowerCase(), w = document.getElementById('searchInput').value.toLowerCase(); if(!w) return; const idx = t.indexOf(w, lastSearchIdx); if(idx !== -1) { editor.setSelectionRange(idx, idx + w.length); lastSearchIdx = idx + w.length; } else { lastSearchIdx = 0; alert("Bitti"); } };
     document.getElementById('btnMenuToggle').onclick = (e) => { e.stopPropagation(); mainMenu.classList.toggle('active'); };
     document.getElementById('menuOpen').onclick = () => fileInput.click();
     document.getElementById('menuSave').onclick = () => saveFile(false);
     document.getElementById('menuSaveAs').onclick = () => saveFile(true);
-    
-    document.getElementById('btnRun').onclick = () => {
-        document.getElementById('previewOverlay').style.display = 'flex';
-        document.getElementById('previewFrame').srcdoc = editor.value;
-    };
-    document.getElementById('btnClosePreview').onclick = () => document.getElementById('previewOverlay').style.display = 'none';
-
-    fileInput.onchange = (e) => {
-        const f = e.target.files[0];
-        if(!f) return;
-        const r = new FileReader();
-        r.onload = (ev) => {
-            const a = tabs.find(t=>t.id===activeTabId);
-            a.name = f.name;
-            a.content = ev.target.result;
-            switchTab(a.id);
-        };
-        r.readAsText(f);
-    };
-
-    // Yazı Boyutu
-    let curFS = parseInt(localStorage.getItem('alpFontSize')) || 14;
-    const setFS = (s) => {
-        curFS = s;
-        document.documentElement.style.setProperty('--editor-font-size', s + 'px');
-        document.getElementById('fontSizeDisplay').textContent = s + 'px';
-        localStorage.setItem('alpFontSize', s);
-    };
+    document.getElementById('btnRun').onclick = () => { document.getElementById('previewOverlay').style.display = 'flex'; document.getElementById('previewFrame').srcdoc = editor.value; };
+    fileInput.onchange = (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = (ev) => { const a = tabs.find(t=>t.id===activeTabId); a.name = f.name; a.content = ev.target.result; switchTab(a.id); }; r.readAsText(f); };
+    let curFS = parseInt(localStorage.getItem('alpFS')) || 14;
+    const setFS = (s) => { curFS = s; document.documentElement.style.setProperty('--editor-font-size', s + 'px'); document.getElementById('fontSizeDisplay').textContent = s + 'px'; localStorage.setItem('alpFS', s); };
     document.getElementById('menuFontSize').onclick = () => document.getElementById('fontSizePopup').classList.add('active');
-    document.getElementById('btnFontInc').onclick = () => setFS(curFS + 1);
-    document.getElementById('btnFontDec').onclick = () => setFS(curFS - 1);
-    document.getElementById('btnFontClose').onclick = () => document.getElementById('fontSizePopup').classList.remove('active');
-
-    // Tema ve Undo/Redo
-    document.getElementById('menuTheme').onclick = () => {
-        document.body.classList.toggle('dark-theme');
-        localStorage.setItem('alpTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    };
-    document.getElementById('menuUndo').onclick = () => {
-        const a = tabs.find(t=>t.id===activeTabId);
-        if(a.historyIndex > 0) { a.historyIndex--; isProg=true; editor.value = a.history[a.historyIndex]; updateLines(); }
-    };
-    document.getElementById('menuRedo').onclick = () => {
-        const a = tabs.find(t=>t.id===activeTabId);
-        if(a.historyIndex < a.history.length - 1) { a.historyIndex++; isProg=true; editor.value = a.history[a.historyIndex]; updateLines(); }
-    };
-
-    window.onclick = () => { mainMenu.classList.remove('active'); ctxMenu.classList.remove('active'); };
-    
-    // Klavye
-    editor.onkeydown = (e) => {
-        if(e.key === 'Tab') { e.preventDefault(); insertTxt('\t'); }
-        const p = {'{':'}', '(':')', '[':']', '"':'"', "'":"'"};
-        if(p[e.key]) {
-            e.preventDefault();
-            const s = editor.selectionStart;
-            editor.setRangeText(e.key + p[e.key], s, editor.selectionEnd, 'end');
-            editor.selectionStart = editor.selectionEnd = s + 1;
-        }
-    };
-
-    // Başlat
+    document.getElementById('btnFontInc').onclick = () => setFS(curFS + 1); document.getElementById('btnFontDec').onclick = () => setFS(curFS - 1);
+    document.getElementById('menuTheme').onclick = () => { document.body.classList.toggle('dark-theme'); localStorage.setItem('alpTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light'); };
+    document.getElementById('menuUndo').onclick = () => { const a = tabs.find(t=>t.id===activeTabId); if(a.historyIndex > 0) { a.historyIndex--; isProg = true; editor.value = a.history[a.historyIndex]; updateLines(); } };
+    document.getElementById('menuRedo').onclick = () => { const a = tabs.find(t=>t.id===activeTabId); if(a.historyIndex < a.history.length - 1) { a.historyIndex++; isProg = true; editor.value = a.history[a.historyIndex]; updateLines(); } };
     if(localStorage.getItem('alpTheme') === 'light') document.body.classList.remove('dark-theme');
-    setFS(curFS);
-    addTab();
+    setFS(curFS); addTab(); window.onclick = () => { mainMenu.classList.remove('active'); ctxMenu.classList.remove('active'); };
+    editor.onkeydown = (e) => { if(e.key === 'Tab') { e.preventDefault(); insertTxt('\t'); } const p = {'{':'}', '(':')', '[':']', '"':'"', "'":"'"}; if(p[e.key]){ e.preventDefault(); const s = editor.selectionStart; editor.setRangeText(e.key + p[e.key], s, editor.selectionEnd, 'end'); editor.selectionStart = editor.selectionEnd = s + 1; } };
 </script>
 </body>
 </html>
