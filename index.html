@@ -935,7 +935,10 @@
                 this.insertText(text);
             }
         };
-
+                // Initialize PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
         App.init();
     </script>
 </body>
