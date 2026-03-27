@@ -4,51 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>AlpEditör Pro</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --ios-bg: #f2f2f7; --ios-header: #f8f8f8; --ios-blue: #007AFF; --ios-border: #c6c6c8;
-            --ios-text: #000000; --ios-menu-bg: rgba(255, 255, 255, 0.95); --ios-tab-bg: #e5e5ea;
-            --ios-tab-active: #ffffff; --ios-line-num: #8e8e93; --fs: 16px;
+            --ios-text: #000000; --ios-menu-bg: rgba(250, 250, 250, 0.95); --ios-tab-bg: #e5e5ea;
+            --ios-tab-active: #ffffff; --ios-line-num: #8e8e93; --editor-font-size: 16px; 
         }
         body.dark-theme {
             --ios-bg: #000000; --ios-header: #1c1c1e; --ios-blue: #0a84ff; --ios-border: #38383a;
-            --ios-text: #ffffff; --ios-menu-bg: rgba(28, 28, 30, 0.95); --ios-tab-bg: #2c2c2e;
+            --ios-text: #ffffff; --ios-menu-bg: rgba(44, 44, 46, 0.95); --ios-tab-bg: #2c2c2e;
             --ios-tab-active: #000000; --ios-line-num: #636366;
         }
-        body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: 0.3s; }
+        body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background-color: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: 0.3s; }
+        
+        header { background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; padding-top: max(15px, env(safe-area-inset-top)); position: relative; z-index: 1000; }
+        .btn-icon { color: var(--ios-blue); background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; }
 
-        header { background: var(--ios-header); border-bottom: 1px solid var(--ios-border); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; padding-top: max(10px, env(safe-area-inset-top)); z-index: 1000; position: relative; }
-        .btn-icon { color: var(--ios-blue); background: none; border: none; font-size: 24px; cursor: pointer; }
-
-        /* Menüler & Popuplar */
-        .dropdown-menu, .ios-menu, .popup-window { position: absolute; background: var(--ios-menu-bg); border-radius: 12px; border: 1px solid var(--ios-border); box-shadow: 0 10px 40px rgba(0,0,0,0.3); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: none; flex-direction: column; overflow: hidden; z-index: 3000; }
+        .dropdown-menu, .popup-window, .ios-context-menu { position: absolute; background-color: var(--ios-menu-bg); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); display: none; flex-direction: column; overflow: hidden; border: 1px solid var(--ios-border); z-index: 2000; }
         .active { display: flex !important; }
-        .menu-btn, .ios-menu button { background: none; border: none; border-bottom: 0.5px solid var(--ios-border); color: var(--ios-blue); padding: 14px 20px; text-align: left; font-size: 16px; cursor: pointer; }
-        .ios-menu button { color: var(--ios-text); padding: 12px 18px; font-size: 15px; }
+        .menu-btn, .ios-context-menu button { background: transparent; border: none; border-bottom: 1px solid var(--ios-border); padding: 12px 20px; font-size: 16px; color: var(--ios-blue); text-align: left; min-width: 170px; cursor: pointer; }
+        .menu-btn:last-child, .ios-context-menu button:last-child { border-bottom: none; }
 
-        .tabs { display: flex; background: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
-        .tab { padding: 10px 15px; background: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; cursor: pointer; font-size: 14px; color: var(--ios-text); display: flex; align-items: center; }
-        .tab.active { background: var(--ios-tab-active); font-weight: bold; }
+        .tabs-container { display: flex; background-color: var(--ios-header); border-bottom: 1px solid var(--ios-border); overflow-x: auto; scrollbar-width: none; }
+        .tab { padding: 10px 15px; font-size: 14px; background-color: var(--ios-tab-bg); border-right: 1px solid var(--ios-border); white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .tab.active { background-color: var(--ios-tab-active); font-weight: 600; }
 
-        .editor-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .lines { width: 45px; background: var(--ios-header); padding: 15px 5px; text-align: right; color: var(--ios-line-num); font-family: monospace; font-size: var(--fs); border-right: 1px solid var(--ios-border); user-select: none; }
-        textarea { flex: 1; border: none; outline: none; padding: 15px; font-size: var(--fs); font-family: monospace; background: transparent; color: var(--ios-text); line-height: 1.5; resize: none; overflow-y: auto; white-space: pre; }
+        .editor-wrapper { display: flex; flex: 1; overflow: hidden; background-color: var(--ios-tab-active); }
+        .line-numbers { width: 45px; padding: 15px 5px; font-family: monospace; font-size: var(--editor-font-size); line-height: 1.5; color: var(--ios-line-num); text-align: right; background-color: var(--ios-header); border-right: 1px solid var(--ios-border); overflow: hidden; user-select: none; }
+        textarea { flex: 1; border: none; padding: 15px; font-size: var(--editor-font-size); line-height: 1.5; font-family: monospace; background: transparent; color: var(--ios-text); outline: none; white-space: pre; resize: none; overflow-y: auto; }
 
-        .toolbar { display: flex; background: var(--ios-header); border-top: 1px solid var(--ios-border); overflow-x: auto; padding: 10px; gap: 8px; }
-        .toolbar button { background: var(--ios-tab-bg); color: var(--ios-text); border: 1px solid var(--ios-border); border-radius: 8px; padding: 12px; min-width: 48px; font-family: monospace; }
-
-        /* CANLI ÖNİZLEME (Eskisi gibi Uygulama İçinde!) */
-        #previewOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 5000; flex-direction: column; }
-        #previewHeader { background: #f8f8f8; padding: 12px 15px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; color: #000; }
-
-        .popup-window { top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; align-items: center; gap: 15px; }
+        #previewOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; flex-direction: column; }
+        .ios-context-menu { flex-direction: row; width: auto; position: fixed; transform: scale(0.95); transition: 0.2s; }
+        .ios-context-menu.active { transform: scale(1); }
+        .ios-context-menu button { padding: 10px 15px; font-size: 14px; color: var(--ios-text); border-right: 1px solid var(--ios-border); border-bottom: none; }
+        .ios-context-menu button:last-child { border-right: none; }
     </style>
 </head>
 <body class="dark-theme">
-
 <header>
-    <div id="fileNameDisplay" style="font-weight: bold;">İsimsiz.html</div>
+    <div class="file-name" id="fileNameDisplay" style="font-weight: 600;">İsimsiz.html</div>
     <div style="display:flex; gap:12px;">
         <button class="btn-icon" onclick="showPreview()">▶️</button>
         <button class="btn-icon" id="btnMenuToggle">•••</button>
@@ -64,121 +61,56 @@
     </div>
 </header>
 
-<div class="tabs">
-    <div id="tabsDiv" style="display:flex;"></div>
-    <button onclick="addTab()" style="padding:10px 20px; color:var(--ios-blue); border:none; background:none; font-size:24px;">+</button>
+<div class="tabs-container"><div id="tabsList" style="display:flex;"></div><button onclick="addTab()" style="padding:10px 20px; color:var(--ios-blue); border:none; background:none; font-size:24px;">+</button></div>
+
+<div class="editor-wrapper"><div class="line-numbers" id="lineNumbers">1</div><textarea id="editor" spellcheck="false" autocomplete="off" wrap="off"></textarea></div>
+
+<div id="fontSizePopup" class="popup-window" style="top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; align-items:center; gap:15px;">
+    <b style="color:var(--ios-text)">Yazı Boyutu</b>
+    <div style="display:flex; gap:20px;"><button onclick="changeFS(-1)" style="width:40px;height:40px;">-</button><span id="fsVal">16px</span><button onclick="changeFS(1)" style="width:40px;height:40px;">+</button></div>
+    <button onclick="document.getElementById('fontSizePopup').classList.remove('active')" style="color:var(--ios-blue);border:none;background:none;font-weight:bold">Tamam</button>
 </div>
 
-<div class="editor-container">
-    <div id="lineNumbers" class="lines">1</div>
-    <textarea id="editor" spellcheck="false" autocomplete="off" wrap="off"></textarea>
-</div>
-
-<div class="toolbar">
-    <button onclick="ins('\t')">TAB</button><button onclick="ins('<')">&lt;</button>
-    <button onclick="ins('>')">&gt;</button><button onclick="ins('/')">/</button>
-    <button onclick="ins('{')">{</button><button onclick="ins('}')">}</button>
-    <button onclick="ins(';')">;</button><button onclick="ins('=')">=</button>
-</div>
-
-<div id="iosContextMenu" class="ios-menu">
-    <button onclick="handleAct('selectAll')">Tümünü Seç</button>
-    <button onclick="handleAct('cut')">Kes</button>
-    <button onclick="handleAct('copy')">Kopyala</button>
+<div id="iosMenu" class="ios-context-menu">
+    <button onclick="handleAct('search')">Ara</button>
+    <button onclick="handleAct('selectAll')">Seç</button>
+    <button onclick="handleAct('copy')">Kopya</button>
     <button onclick="handleAct('paste')">Yapıştır</button>
     <button onclick="handleAct('delete')" style="color:red">Sil</button>
 </div>
 
-<div id="fontSizePopup" class="popup-window">
-    <b style="color:var(--ios-text)">Yazı Boyutu</b>
-    <div style="display:flex; align-items:center; gap:20px;">
-        <button onclick="changeFS(-1)" style="width:40px; height:40px;">-</button>
-        <span id="fsVal" style="font-weight:bold; color:var(--ios-text)">16px</span>
-        <button onclick="changeFS(1)" style="width:40px; height:40px;">+</button>
-    </div>
-    <button onclick="document.getElementById('fontSizePopup').classList.remove('active')" style="color:var(--ios-blue); border:none; background:none; font-weight:bold;">Tamam</button>
-</div>
-
 <div id="previewOverlay">
-    <div id="previewHeader">
-        <b id="previewName">Canlı Önizleme</b>
-        <button onclick="closePreview()" style="background:red; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold;">Kapat</button>
+    <div style="background:#f8f8f8; padding:10px; display:flex; justify-content:space-between; border-bottom:1px solid #ddd; align-items:center;">
+        <b style="color:black">Canlı Önizleme</b>
+        <button onclick="document.getElementById('previewOverlay').style.display='none'" style="background:red; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold;">Kapat</button>
     </div>
     <iframe id="previewFrame" style="flex:1; width:100%; border:none;"></iframe>
 </div>
 
-<input type="file" id="fileInput" style="display:none;">
+<input type="file" id="fileInput" style="display:none;" accept=".txt,.html,.js,.css,.json">
 
 <script>
-    const editor = document.getElementById('editor'), ln = document.getElementById('lineNumbers'), mainMenu = document.getElementById('mainMenu'), ctxMenu = document.getElementById('iosContextMenu');
+    const editor = document.getElementById('editor'), ln = document.getElementById('lineNumbers'), mainMenu = document.getElementById('mainMenu'), ctxMenu = document.getElementById('iosMenu');
     let tabs = [], activeTabId = null, tabCounter = 0, isProg = false, curFS = 16;
 
-    // --- 1. ÖNİZLEME (INLINE SİSTEM) ---
-    function showPreview() {
-        const overlay = document.getElementById('previewOverlay');
-        const frame = document.getElementById('previewFrame');
-        overlay.style.display = 'flex';
-        frame.srcdoc = editor.value;
-    }
-    function closePreview() {
-        document.getElementById('previewOverlay').style.display = 'none';
-        document.getElementById('previewFrame').srcdoc = '';
-    }
-
-    // --- 2. TEMA VE AYARLAR ---
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
-        localStorage.setItem('alpTheme', isDark ? 'dark' : 'light');
-        mainMenu.classList.remove('active');
-    }
-
-    function showFS() { document.getElementById('fontSizePopup').classList.add('active'); mainMenu.classList.remove('active'); }
-    function changeFS(v) {
-        curFS += v;
-        document.documentElement.style.setProperty('--fs', curFS + 'px');
-        document.getElementById('fsVal').textContent = curFS + 'px';
-        localStorage.setItem('alpFS', curFS);
-    }
-
-    // --- 3. SAĞ TIK MENÜSÜ KONTROLÜ ---
-    editor.oncontextmenu = (e) => {
-        e.preventDefault();
-        ctxMenu.style.display = 'flex';
-        let x = e.clientX, y = e.clientY;
-        if(x + 180 > window.innerWidth) x = window.innerWidth - 190;
-        ctxMenu.style.left = x + 'px'; ctxMenu.style.top = (y - 50) + 'px';
-        ctxMenu.classList.add('active');
-    };
-
-    // Herhangi bir yere tıklayınca menüleri kapat
-    window.onclick = (e) => {
-        if (!e.target.closest('.btn-icon')) mainMenu.classList.remove('active');
-        if (!e.target.closest('textarea')) ctxMenu.classList.remove('active');
-    };
-
-    // --- 4. EDİTÖR FONKSİYONLARI ---
+    // --- TEMEL FONKSİYONLAR ---
     function updateLines() { const l = editor.value.split('\n').length; ln.innerHTML = Array.from({length:l}, (_,i)=>i+1).join('<br>'); }
-    function ins(t){ editor.setRangeText(t, editor.selectionStart, editor.selectionEnd, 'end'); editor.focus(); updateLines(); }
-
-    function addTab(n="İsimsiz.html", c=""){
-        tabCounter++; tabs.push({id:tabCounter, name:n, content:c, his:[c], i:0}); switchTab(tabCounter);
-    }
-    function switchTab(id){
-        if(activeTabId){ let t=tabs.find(x=>x.id===activeTabId); if(t) t.content=editor.value; }
-        activeTabId=id; let t=tabs.find(x=>x.id===id); isProg=true; editor.value=t.content; 
-        document.getElementById('fileNameDisplay').textContent=t.name; renderTabs(); updateLines();
-    }
-    function renderTabs(){
-        const d=document.getElementById('tabsDiv'); d.innerHTML='';
-        tabs.forEach(t=>{
-            const el=document.createElement('div'); el.className=`tab ${t.id===activeTabId?'active':''}`;
-            el.innerHTML=`${t.name} <span onclick="event.stopPropagation();delTab(${t.id})" style="margin-left:8px;opacity:0.5">×</span>`;
-            el.onclick=()=>switchTab(t.id); d.appendChild(el);
-        });
-    }
+    function addTab(n="İsimsiz.html", c=""){ tabCounter++; tabs.push({id:tabCounter, name:n, content:c, his:[c], i:0}); switchTab(tabCounter); }
+    function switchTab(id){ if(activeTabId){ let t=tabs.find(x=>x.id===activeTabId); if(t) t.content=editor.value; } activeTabId=id; let t=tabs.find(x=>x.id===id); isProg=true; editor.value=t.content; document.getElementById('fileNameDisplay').textContent=t.name; renderTabs(); updateLines(); }
+    function renderTabs(){ const d=document.getElementById('tabsList'); d.innerHTML=''; tabs.forEach(t=>{ const el=document.createElement('div'); el.className=`tab ${t.id===activeTabId?'active':''}`; el.innerHTML=`${t.name} <span onclick="event.stopPropagation();delTab(${t.id})" style="margin-left:8px;opacity:0.5">×</span>`; el.onclick=()=>switchTab(t.id); d.appendChild(el); }); }
     function delTab(id){ if(tabs.length===1) return; tabs=tabs.filter(t=>t.id!==id); switchTab(tabs[0].id); }
 
+    // --- MENÜ VE TEMA (STORAGE DESTEKLİ) ---
+    function toggleTheme() { document.body.classList.toggle('dark-theme'); localStorage.setItem('alpTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light'); mainMenu.classList.remove('active'); }
+    function showFS() { document.getElementById('fontSizePopup').classList.add('active'); mainMenu.classList.remove('active'); }
+    function changeFS(v) { curFS += v; document.documentElement.style.setProperty('--editor-font-size', curFS + 'px'); document.getElementById('fsVal').textContent = curFS + 'px'; localStorage.setItem('alpFS', curFS); }
+
+    // --- SAĞ TIK (KAPANMA DÜZELTİLDİ) ---
+    editor.oncontextmenu = (e) => { e.preventDefault(); ctxMenu.style.display = 'flex'; ctxMenu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px'; ctxMenu.style.top = (e.clientY - 50) + 'px'; ctxMenu.classList.add('active'); };
+    window.addEventListener('click', (e) => { if(!e.target.closest('#btnMenuToggle')) mainMenu.classList.remove('active'); if(!e.target.closest('textarea')) ctxMenu.classList.remove('active'); });
+
+    // --- ÖNİZLEME VE AKSİYONLAR ---
+    function showPreview() { document.getElementById('previewOverlay').style.display='flex'; document.getElementById('previewFrame').srcdoc=editor.value; }
     async function handleAct(act){
         editor.focus();
         if(act==='selectAll') editor.select();
@@ -186,43 +118,33 @@
         else if(act==='cut') { await navigator.clipboard.writeText(editor.value.substring(editor.selectionStart, editor.selectionEnd)); editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end'); }
         else if(act==='paste') { const t=await navigator.clipboard.readText(); editor.setRangeText(t, editor.selectionStart, editor.selectionEnd, 'end'); }
         else if(act==='delete') editor.setRangeText('', editor.selectionStart, editor.selectionEnd, 'end');
+        else if(act==='search') { mainMenu.classList.remove('active'); /* search popup */ }
         updateLines(); ctxMenu.classList.remove('active');
     }
 
-    // --- 5. DOSYA İŞLEMLERİ ---
+    // --- DOSYA VE HAFIZA ---
     function saveFile(asNew){
         let t=tabs.find(x=>x.id===activeTabId); let n=t.name;
         if(asNew || n==="İsimsiz.html"){ n=prompt("Dosya adı:", n); if(!n) return; t.name=n; renderTabs(); }
-        const b=new Blob([editor.value], {type:'text/html'});
-        const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=n; a.click();
+        const b=new Blob([editor.value], {type:'text/html'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=n; a.click();
     }
-    document.getElementById('fileInput').onchange = (e) => {
-        const f=e.target.files[0]; if(!f) return;
-        const r=new FileReader(); r.onload=(ev)=>{
-            const t=tabs.find(x=>x.id===activeTabId); t.name=f.name; t.content=ev.target.result; t.his=[ev.target.result]; t.i=0; switchTab(t.id);
-        }; r.readAsText(f);
-    };
+    document.getElementById('fileInput').onchange = (e) => { const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=(ev)=>{ const t=tabs.find(x=>x.id===activeTabId); t.name=f.name; t.content=ev.target.result; t.his=[ev.target.result]; t.i=0; switchTab(t.id); }; r.readAsText(f); };
 
     function undo(){ let t=tabs.find(x=>x.id===activeTabId); if(t.i>0){t.i--; isProg=true; editor.value=t.his[t.i]; updateLines();} }
     function redo(){ let t=tabs.find(x=>x.id===activeTabId); if(t.i<t.his.length-1){t.i++; isProg=true; editor.value=t.his[t.i]; updateLines();} }
 
     document.getElementById('btnMenuToggle').onclick = (e) => { e.stopPropagation(); mainMenu.classList.toggle('active'); };
 
-    // Başlangıç
     window.onload = () => {
         const theme = localStorage.getItem('alpTheme') || 'dark';
         if(theme === 'light') document.body.classList.remove('dark-theme');
-        const fs = localStorage.getItem('alpFS') || 16;
-        curFS = parseInt(fs);
-        document.documentElement.style.setProperty('--fs', curFS + 'px');
+        curFS = parseInt(localStorage.getItem('alpFS')) || 16;
+        document.documentElement.style.setProperty('--editor-font-size', curFS + 'px');
         document.getElementById('fsVal').textContent = curFS + 'px';
         addTab();
     };
 
-    editor.oninput = () => {
-        updateLines(); const t=tabs.find(x=>x.id===activeTabId);
-        if(!isProg){ t.his.push(editor.value); t.i++; } isProg=false;
-    };
+    editor.oninput = () => { updateLines(); const t=tabs.find(x=>x.id===activeTabId); if(!isProg){ t.his.push(editor.value); t.i++; } isProg=false; };
     editor.onscroll = () => { ln.scrollTop = editor.scrollTop; };
 </script>
 </body>
