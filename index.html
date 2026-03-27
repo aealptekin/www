@@ -638,16 +638,68 @@
             saveFile() {
                 const tab = this.getActiveTab();
                 if(!tab) return;
-                const blob = new Blob([this.el.editor.value], {type: 'text/plain'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = tab.name;
-                a.click();
-                URL.revokeObjectURL(url);
-                tab.modified = false;
-                this.renderTabs();
-            },
+                
+                const fileName = tab.name;
+                const extension = fileName.split('.').pop().toLowerCase();
+                
+                // Dosya uzantılarına göre MIME type haritası
+                const mimeTypes = {
+                    // Metin ve Belge Dosyaları
+                    'txt': 'text/plain',
+                    'log': 'text/plain',
+                    'md': 'text/markdown',
+                    
+                    // Web Dilleri
+                    'html': 'text/html',
+                    'htm': 'text/html',
+                    'css': 'text/css',
+                    'js': 'text/javascript',
+                    'mjs': 'text/javascript',
+                    'xml': 'application/xml',
+                    'json': 'application/json',
+                    
+                    // C-Ailesi
+                    'c': 'text/plain',
+                    'cpp': 'text/plain',
+                    'h': 'text/plain',
+                    'cs': 'text/plain',
+                    
+                    // Scripting Dilleri
+                    'py': 'text/x-python',
+                    'php': 'text/x-php',
+                    'rb': 'text/x-ruby',
+                    
+                    // Diğer Programlama Dilleri
+                    'java': 'text/x-java',
+                    'sh': 'text/x-shellscript',
+                    'bash': 'text/x-shellscript',
+                    'pl': 'text/x-perl',
+                    
+                    // Veritabanı ve Yapılandırma
+                    'sql': 'text/x-sql',
+                    'yaml': 'text/yaml',
+                    'yml': 'text/yaml',
+                    'ini': 'text/plain',
+                    'cfg': 'text/plain',
+                    'conf': 'text/plain'
+                };
+    
+    // Varsayılan olarak text/plain kullan, uzantı bulunamazsa veya tanımlı değilse
+    const contentType = mimeTypes[extension] || 'text/plain';
+    
+    const blob = new Blob([this.el.editor.value], {type: contentType});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    tab.modified = false;
+    this.renderTabs();
+}
 
             async saveZip() {
                 const tab = this.getActiveTab();
